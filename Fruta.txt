@@ -1,1 +1,0 @@
-Código: 1, Nombre: Manzana, Precio: 1200.0, Stock: 56, Vitaminas: 132

@@ -1,1 +1,0 @@
-Código: 120, Nombre: Lechuga, Precio: 2000.0, Stock: 80, Conservación: En un lugar fresco y seco, de preferencia frio

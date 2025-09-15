@@ -3,7 +3,7 @@ class Producto:
         self.codigo = codigo
         self.nombre = nombre
         self.precio = precio
-        self.stock = stock
+        self.stock = stock#
 
 class Fruta(Producto):
     def __init__(self,codigo:int,nombre:str,precio:float,stock:int,vitaminas:str):
