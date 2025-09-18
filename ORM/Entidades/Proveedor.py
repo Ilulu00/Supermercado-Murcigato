@@ -24,7 +24,7 @@ class Proveedor(Base):
 
     __tablename__= 'Proveedor'
 
-    id_proveedor = Column(UUID(as_uuid=True), primary_key=True, default=UUID.uuid4() ,nullable=False)
+    id_proveedor = Column(UUID(as_uuid=True), primary_key=True, default=uuid4 ,nullable=False)
     primer_nombre = Column(String(50), nullable=False)
     segundo_nombre = Column(String(50), nullable=True)
     primer_apellido = Column(String(50), nullable=False)
@@ -97,7 +97,7 @@ class ProveedorBase(BaseModel):
 class CrearProveedor(ProveedorBase):
     """Clase para crear un Proveedor"""
     
-    if (self.Usuario.rol == 'administrador'):
+    if (self.usuarioCreador.rol == 'administrador'):
         primer_nombre:str = Field(..., min_length=3, max_length=15)
         segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
         primer_apellido: str = Field(..., min_length=3, max_length=15)
@@ -144,7 +144,7 @@ class CrearProveedor(ProveedorBase):
 class ActualizarProveedor(ProveedorBase):
     """Clase para actualizar algo de un Proveedor existente"""
     
-    if(self.Usuario.rol == 'administrador'):
+    if(self.usuarioCreador.rol == 'administrador'):
         
         primer_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
         segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
@@ -198,7 +198,7 @@ class RespuestaProveedor(ProveedorBase):
 
 class ListaProveedores(BaseModel):
     
-    usuarios: List[RespuestaProveedor]
+    proveedores: List[RespuestaProveedor]
     total: int
     pagina: int
     por_pagina: int

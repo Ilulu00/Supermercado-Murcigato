@@ -42,3 +42,5 @@ class Producto(Base):
     # Relaciones
     categoria = relationship("Categoria", back_populates="productos")
     usuario = relationship("Usuario", back_populates="productos")
+    productoCarrito = relationship("Carrito", back_populates="carritoProducto")
+    carritos = relationship("Detalle_carrito", back_populates="producto")

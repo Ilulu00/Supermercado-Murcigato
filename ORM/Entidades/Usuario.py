@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Optional, List
 from uuid import uuid4, UUID
 
-Base = declarative_base
+Base = declarative_base()
 
 class Usuario (Base):
     """
@@ -32,7 +32,7 @@ class Usuario (Base):
     
     __tablename__ = 'Usuarios'
     
-    id_usuario = Column(UUID(as_uuid=True), primary_key=True, default= UUID.uuid4(), nullable=False)
+    id_usuario = Column(UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False)
     primer_nombre = Column(String(50), nullable=False)
     segundo_nombre = Column(String(50), nullable=True)
     primer_apellido = Column(String(50), nullable=False)
@@ -46,7 +46,8 @@ class Usuario (Base):
     fecha_actul = Column(DateTime, default=datetime.now, onupdate=datetime.now )
     
     proveedorCreado = relationship("Proveedor", back_populates= "usuarioCreador")
-    proveedorActualizado = relationship("Proveedor", back_populates= " usuarioActualizador")
+    proveedorActualizado = relationship("Proveedor", back_populates= "usuarioActualizador")
+    usuarioCarrito = relationship("Carrito", back_populates="carritoUsuario")
     
     
     
@@ -78,7 +79,7 @@ class UsuarioBase(BaseModel):
     direccion: EmailStr = Field(..., min_length=2, max_length=100, description= "Lugar de residencia del usuario")
     correo: str = Field(..., min_length=5, max_length=150, description= "Correo electronico del usuario")
     telefono: Optional[str] = Field(None, min_length=4, max_length=20, description= "Número de contacto del usuario")
-    rol: String = Field(..., min_length=5, max_length=20, description= "Rol que identifica al usuario.")
+    rol: str = Field(..., min_length=5, max_length=20, description= "Rol que identifica al usuario.")
     activo: bool = Field(True, description= "Señal del usuario, para verificar si esta activo o no")
     
     
@@ -102,11 +103,10 @@ class UsuarioBase(BaseModel):
     
     @field_validator('rol')
     def val_rol(cls, v):
-            if not v.script():
+            if not v.strip():
                 raise ValueError('El rol no puede estar vacio, todos los usuarios tiene un rol')
             return f"Su rol es: {v.strip()}"
             
-    
     @field_validator('correo')
     def val_correo(cls, v):
         if not v.strip():
@@ -153,8 +153,6 @@ class UsuarioCreate(UsuarioBase):
             if v and not v.replace('+','').replace('-','').replace(' ','').replace('(','').replace(')','').isdigit():
                 raise ValueError('Formato de telefono no apto.')
         return v
-
-
 class ActualizarUsuario(UsuarioBase):
     """Clase para actualizar algo de un usuario existente"""
     
@@ -187,7 +185,6 @@ class ActualizarUsuario(UsuarioBase):
                 raise ValueError('Formato de telefono no apto.')
         return v
 
-
 class RespuestaUsuario(UsuarioBase):
     
     id: int
@@ -197,7 +194,6 @@ class RespuestaUsuario(UsuarioBase):
     class Config:
         from_attributes = True
         json_encoders = {datetime: lambda v: v.isoformat()}
-
 
 class ListaUsuarios(BaseModel):
     
