@@ -1,1 +1,0 @@
-Código: 3, Nombre: Pollo, Precio: 67800.0, Stock: 76, Animal de procedencia: Gallina Criolla

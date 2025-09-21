@@ -1,10 +1,9 @@
-# Examen1
-Repositorio para el examen 1 de programacion de software. 
+# Supermercado Murcigato
+Rama dev, llamada tambien rama de desarrollo. Seria la rama principal, en la cual se realizaria todos los procedimientos del software. En este caso de un supermercado
 
-Nuestro grupo esta conformado por: Mariana Diaz Restrpo y Santiago Florez Serna, somos el grupo 12.
-El caso que nos toco es el numero 9: un supermercado.
+- Nuestro grupo esta conformado por: Mariana Diaz Restrepo y Santiago Florez Serna, somos el grupo 12.
+- Este proyecto trata de un sistema de supermercado, el cual se llama "Murcigato". 
 
-Aqui ira la descripcion del caso, asi como clonar este repo, asi el como hacer que funcione el codigo.
 
-En nuestro caso, se requiere un "menu" para los empleados (creeriamos), en el cual se pueda facturar la compra, aplicar algun descuento y ver el inventario; y talvez gestionarlo.
+
 
