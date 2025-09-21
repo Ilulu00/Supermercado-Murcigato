@@ -40,15 +40,16 @@ class Usuario (Base):
     direccion = Column(String(100), nullable=False)
     telefono = Column(String(20), nullable=True)
     correo = Column(String(100), nullable=False)
-    rol = Column(String(20), nullable=False)
+    contraseña = Column(String(100), nullable=False)
+    rol = Column(String(20), default="Cliente", nullable=False)
     activo = Column(Boolean, default=True, nullable=False)
     fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
-    fecha_actul = Column(DateTime, default=datetime.now, onupdate=datetime.now )
+    fecha_actul = Column(DateTime, onupdate=datetime.now )
     
     proveedorCreado = relationship("Proveedor", back_populates= "usuarioCreador")
     proveedorActualizado = relationship("Proveedor", back_populates= "usuarioActualizador")
     usuarioCarrito = relationship("Carrito", back_populates="carritoUsuario")
-    
+    facturaU = relationship("Factura", back_populates="usuarioF")
     
     
     
@@ -63,6 +64,7 @@ class Usuario (Base):
                 'Segundo apellido': self.segundo_apellido,
                 'Direccion': self.direccion,
                 'Correo': self.correo,
+                'Contraseña': self.contraseña,
                 'Telefono': self.telefono,
                 'Rol': self.rol,
                 'activo': self.activo,
@@ -78,6 +80,7 @@ class UsuarioBase(BaseModel):
     segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15, description= "segundo apellido del usuario")
     direccion: EmailStr = Field(..., min_length=2, max_length=100, description= "Lugar de residencia del usuario")
     correo: str = Field(..., min_length=5, max_length=150, description= "Correo electronico del usuario")
+    contraseña: str = Field(..., min_length=5, max_length=100, description="Contraseña del correo del usuario.")
     telefono: Optional[str] = Field(None, min_length=4, max_length=20, description= "Número de contacto del usuario")
     rol: str = Field(..., min_length=5, max_length=20, description= "Rol que identifica al usuario.")
     activo: bool = Field(True, description= "Señal del usuario, para verificar si esta activo o no")
@@ -121,7 +124,7 @@ class UsuarioBase(BaseModel):
                 raise ValueError('Formato de telefono no apto.')
         return v
 
-class UsuarioCreate(UsuarioBase):
+class CrearUsuario(UsuarioBase):
     """Clase para crear un usuario"""
     
     primer_nombre: str = Field(..., min_length=3, max_length=15)
@@ -130,6 +133,7 @@ class UsuarioCreate(UsuarioBase):
     segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
     direccion: str = Field(..., min_length=2, max_length=100)
     correo: EmailStr = ...
+    contraseña: str = ...
     telefono: Optional[str] = Field(None, max_length=20)
     rol: String = Field(..., min_length=5, max_length=20)
     activo: Optional[bool] = Field(True)
@@ -188,6 +192,15 @@ class ActualizarUsuario(UsuarioBase):
 class RespuestaUsuario(UsuarioBase):
     
     id: int
+    primer_nombre: str
+    segundo_nombre: Optional[str] = None
+    primer_apellido: str
+    segundo_apellido: Optional[str] = None
+    direccion: str
+    correo: EmailStr
+    contraseña: str
+    telefono: Optional[str]
+    rol: str
     fecha_registro: datetime
     fecha_actul: Optional[datetime] = None 
     

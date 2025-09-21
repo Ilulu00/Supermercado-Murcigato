@@ -2,10 +2,10 @@
 Modelo de la entidad DetalleCarrito.
 Aqui sera donde se creara la entidad carritocon SQLalchemy, asi como algunas validaciones con pydantic
 """
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional, List
 from uuid import uuid4, UUID
@@ -17,7 +17,8 @@ class Detalle_carrito (Base):
     Modelo de los detalles de un carro de compras, donde se podran guardar mas de 1 producto.
     
         id_detalle_carrito: identificador unico.
-        id_producto: LLave foranea que conecte los productos y sus datos con Carrito
+        id_carrito: Llave foranea que conecta al carrito con los detalles de los productos.
+        id_producto: LLave foranea que conecte los productos y sus datos con el Detalle carrito
         cantidad: cuanta cantidad de x producto hay en el carrito.
       
     """

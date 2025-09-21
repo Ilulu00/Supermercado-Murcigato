@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
@@ -12,7 +12,7 @@ class Proveedor(Base):
         id_proveedor: identificador unico.
         primer_nombre: El primer nombre del proveedor.
         segundo_nombre: El aegundo nombre del proveedor.
-        segundo_apellido: El segundo apellido del proveedor.
+        primer_apellido: El segundo apellido del proveedor.
         segundo_apellido: El segundo apellido del proveedor.
         telefono: Como contactar al proveedor.
         correo: direccion de correo del proveedor.
@@ -34,7 +34,7 @@ class Proveedor(Base):
     id_usuarioCrea = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
     id_usuarioActual = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=True)
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
-    fecha_actualizacion = Column(DateTime, nullable=True)
+    fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
     
     usuarioCreador = relationship("Usuario", back_populates="proveedorCreado")
     usuarioActualizador = relationship("Usuario", back_populates= "proveedorActualizado")
@@ -96,98 +96,92 @@ class ProveedorBase(BaseModel):
 
 class CrearProveedor(ProveedorBase):
     """Clase para crear un Proveedor"""
+
+    primer_nombre:str = Field(..., min_length=3, max_length=15)
+    segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
+    primer_apellido: str = Field(..., min_length=3, max_length=15)
+    segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
+    correo: EmailStr = ...
+    telefono: Optional[str] = Field(None, max_length=20)
+    activo: Optional[bool] = Field(True)
+    id_usuarioCrea: UUID = Field(...)
+    fecha_creacion: datetime = Field(...)
     
-    if (self.usuarioCreador.rol == 'administrador'):
-        primer_nombre:str = Field(..., min_length=3, max_length=15)
-        segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
-        primer_apellido: str = Field(..., min_length=3, max_length=15)
-        segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
-        correo: EmailStr = ...
-        telefono: Optional[str] = Field(None, max_length=20)
-        activo: Optional[bool] = Field(True)
-        id_usuarioCrea: UUID = Field(...)
-        fecha_creacion: datetime = Field(...)
-    
-        @field_validator('primer_nombre')
-        def val_primerNombre(cls, v):
-            if v is not None and not v.strip():
-                raise ValueError('Lo siento, el primer nombre no puede estar vacío.')
-            return v.strip().title() if v else v
+    @field_validator('primer_nombre')
+    def val_primerNombre(cls, v):
+        if v is not None and not v.strip():
+            raise ValueError('Lo siento, el primer nombre no puede estar vacío.')
+        return v.strip().title() if v else v
         
-        @field_validator('primer_apellido')
-        def val_primerapellido(cls, v):
-            if v is not None and not v.strip():
-             raise ValueError('Lo siento, el primer apellido no puede estar vacío.')
-            return v.strip().title() if v else v
+    @field_validator('primer_apellido')
+    def val_primerapellido(cls, v):
+        if v is not None and not v.strip():
+            raise ValueError('Lo siento, el primer apellido no puede estar vacío.')
+        return v.strip().title() if v else v
     
-        @field_validator('correo')
-        def val_correo(cls, v):
-            if not v.strip():
-                raise ValueError('El correo no puede quedar vacío.')
-            return v.strip().title()
+    @field_validator('correo')
+    def val_correo(cls, v):
+        if not v.strip():
+            raise ValueError('El correo no puede quedar vacío.')
+        return v.strip().title()
     
     
-        @field_validator('telefono')
-        def valTel(cls, v):
-            if v is not None:
-                v = v.strip()
-                if v and not v.replace('+','').replace('-','').replace(' ','').replace('(','').replace(')','').isdigit():
-                    raise ValueError('Formato de telefono no apto.')
-            return v
-    else:
-        print("Lo siento, pero usted no es un administrador, por lo tanto no puede actualizar los registros.")
-    
-
-
-
+    @field_validator('telefono')
+    def valTel(cls, v):
+        if v is not None:
+            v = v.strip()
+            if v and not v.replace('+','').replace('-','').replace(' ','').replace('(','').replace(')','').isdigit():
+                raise ValueError('Formato de telefono no apto.')
+        return v
 
 class ActualizarProveedor(ProveedorBase):
     """Clase para actualizar algo de un Proveedor existente"""
+       
+    primer_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
+    segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
+    primer_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
+    segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
+    correo: Optional[EmailStr] = None
+    telefono: Optional[str] = Field(None, max_length=20)
+    activo: Optional[bool] = Field(True)
+    id_usuarioActual: UUID = Field(...)
+    fecha_actualizacion: DateTime = Field(...)
     
-    if(self.usuarioCreador.rol == 'administrador'):
+    @field_validator('primer_nombre')
+    def val_primerNombre(cls, v):
+        if v is not None and not v.strip():
+            raise ValueError('Lo siento, el primer nombre no puede estar vacío.')
+        return v.strip().title() if v else v
         
-        primer_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
-        segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
-        primer_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
-        segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
-        correo: Optional[EmailStr] = None
-        telefono: Optional[str] = Field(None, max_length=20)
-        activo: Optional[bool] = Field(True)
-        id_usuarioActual: UUID = Field(...)
-        fecha_actualizacion: DateTime = Field(...)
+    @field_validator('primer_apellido')
+    def val_primerapellido(cls, v):
+        if v is not None and not v.strip():
+            raise ValueError('Lo siento, el primer apellido no puede estar vacío.')
+        return v.strip().title() if v else v
     
-        @field_validator('primer_nombre')
-        def val_primerNombre(cls, v):
-            if v is not None and not v.strip():
-                raise ValueError('Lo siento, el primer nombre no puede estar vacío.')
-            return v.strip().title() if v else v
-        
-        @field_validator('primer_apellido')
-        def val_primerapellido(cls, v):
-            if v is not None and not v.strip():
-             raise ValueError('Lo siento, el primer apellido no puede estar vacío.')
-            return v.strip().title() if v else v
-    
-        @field_validator('correo')
-        def val_correo(cls, v):
-            if not v.strip():
-                raise ValueError('El correo no puede quedar vacío.')
-            return v.strip().title()
+    @field_validator('correo')
+    def val_correo(cls, v):
+        if not v.strip():
+            raise ValueError('El correo no puede quedar vacío.')
+        return v.strip().title()
     
     
-        @field_validator('telefono')
-        def valTel(cls, v):
-            if v is not None:
-                v = v.strip()
-                if v and not v.replace('+','').replace('-','').replace(' ','').replace('(','').replace(')','').isdigit():
-                    raise ValueError('Formato de telefono no apto.')
-            return v
-
-    else:
-        print("Lo siento, pero usted no es un administrador, por lo tanto no puede actualizar los registros.")
+    @field_validator('telefono')
+    def valTel(cls, v):
+        if v is not None:
+            v = v.strip()
+            if v and not v.replace('+','').replace('-','').replace(' ','').replace('(','').replace(')','').isdigit():
+                raise ValueError('Formato de telefono no apto.')
+        return v
 class RespuestaProveedor(ProveedorBase):
     
     id: int
+    Primer_nombre: str
+    Segundo_nombre: Optional[str] = None
+    Primer_apellido: str
+    Segundo_apellido: Optional[str] = None
+    Correo: EmailStr
+    Telefono: Optional[str] = None
     fecha_creacion: datetime
     fecha_actulizacion: Optional[datetime] = None 
     

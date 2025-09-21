@@ -2,10 +2,10 @@
 Modelo de la entidad Carrito.
 Aqui sera donde se creara la entidad carritocon SQLalchemy, asi como algunas validaciones con pydantic
 """
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional, List
 from uuid import uuid4, UUID
@@ -17,7 +17,6 @@ class Carrito (Base):
     Modelo de un carro de compras, la cual sera una tabla.
     
         id_carrito: identificador unico.
-        id_producto: LLave foranea que conecte los productos y sus datos con Carrito
         id_usuario: El id del usuario al q pertenece el carrito de compras
       
     """
@@ -25,19 +24,15 @@ class Carrito (Base):
     __tablename__ = 'Carrito'
     
     id_carrito= Column(UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False)
-    id_producto = Column(UUID(as_uuid=True), ForeignKey("Producto.id_producto"), nullable=False)
+    id_detalle = Column(UUID(as_uuid=True), ForeignKey("Detalle_carrito.id_detalle"), nullable=False)
     id_usuario = Column(UUID(as_uuid=True), ForeignKey("Usuario.id_usuario"), nullable=False)
-    
+    fecha_crea = Column(DateTime, default=datetime.now)
+    fecha_actul = Column(DateTime, onupdate=datetime.now)
     
     carritoUsuario = relationship("Usuario", back_populates="usuarioCarrito")
-    carritoProducto = relationship("Producto", back_populates="productoCarrito", uselist=True)
     productos = relationship("Detalle_carrito", back_populates="carrito")
-    
-    @property
-    def precio_total(self):
-        return sum(p.precio_producto for p in self.carritoProducto)
-    
-    
+    facturaC = relationship('Factura', back_populates="carritoF")
+       
     @property
     def total(self):
         return sum(self.productos.subtotal)
@@ -46,7 +41,7 @@ class Carrito (Base):
     def __repr__(self):
         return (f"<Carrito de compras {self.id_carrito}.\n"
             f"ID del cliente: {self.carritoUsuario.id_usuario}\n"
-            f"Cantidad de productos: {len(self.carritoProducto)}"
+            f"Cantidad de productos: {len(self.productos)}"
             f"Total a pagar: {self.precio_total}>")
     
     def to_dict(self):
@@ -63,7 +58,7 @@ class Carrito (Base):
                     'Precio': p.precio_producto
                     }for p in self.carritoProducto
                 ],
-                'Precio total': self.precio_total
+                'Precio total': self.total
                 }
         
 
@@ -75,7 +70,7 @@ class CarritoBase(BaseModel):
 class RespuestaCarrito(CarritoBase):
     
     id: int
-    fecha_registro: datetime
+    fecha_crea: datetime
     fecha_actul: Optional[datetime] = None 
     
     class Config:
