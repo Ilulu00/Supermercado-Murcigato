@@ -8,7 +8,6 @@ from Entidades.Usuario import Usuario
 from sqlalchemy.orm import Session
 import bcrypt
 
-
 class UsuarioCRUD:
     def __init__(self, db: Session):
         self.db = db
@@ -176,8 +175,6 @@ class UsuarioCRUD:
         self.db.commit()
         return True
     
-   
-
     
     def obtener_usuarios(self, skip: int = 0, limit: int = 100) -> List[Usuario]:
         """Modulo para mostrar una lista de usuarios con paginas.
@@ -193,11 +190,12 @@ class UsuarioCRUD:
             self.db.query(Usuario).offset(skip).limit(limit).all()
         )
     
-    def actualizar_usuario(self, id_usuario: UUID, **kwargs) -> Optional[Usuario]:
+    def actualizar_usuario(self, id_usuario: UUID, id_usuarioActual, **kwargs) -> Optional[Usuario]:
         """Modulo para actualizar alguna usuario, usando validaciones.
 
             Args:
                 id_usuario: UUID del usuario
+                id_usuarioActual: UUID del usuario (admin) que edito al usuario.
                 **kwargs: campos a actualizar
                 
             Returns: Usuario actualizado o None
@@ -210,7 +208,7 @@ class UsuarioCRUD:
             return None
         
         if "correo" in kwargs:
-            correo = kwargs["correo"]
+            correo = kwargs.pop("correo")
             if not self.validar_correo(correo):
                 raise ValueError("Correo inválido.")
             if(
