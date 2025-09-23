@@ -12,6 +12,18 @@ from uuid import UUID, uuid
 
 
 class Categoria(Base):
+    """
+    Modelo de Categoria que representa la tabla 'Categorias'
+
+    Atributos:
+        id_cateoria: Identificador único del producto
+        nombre_categoria: Nombre de la categoria
+        descripción: Descripcion de cada categoria
+        fecha_creacion: Fecha y hora de creación
+        fecha_actualizacion: Fecha y hora de última actualización
+        id_usuarioCrea: ID del usuario que creó el producto
+        id_usuarioActualiza: ID del usuario que actualizo el producto.
+    """
 
     __tablename__ = "Categorias"
 
@@ -20,23 +32,23 @@ class Categoria(Base):
     )
     nombre_categoria = Column(String(100), nullable=False, unique=True)
     descripcion = Column(Text, nullable=True)
-    fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
-    fecha_actul = Column(DateTime, onupdate=datetime.now)
 
+    fecha_creacion = Column(DateTime, default=datetime.now, nullable=False)
+    fecha_actualizacion = Column(DateTime, onupdate=datetime.now)
     id_usuarioCrea = Column(
         UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=False
     )
-    id_usuarioActual = Column(
+    id_usuarioActualiza = Column(
         UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=True
     )
 
-    productos = relationship("Producto", back_populates="categoria")
+    productos = relationship("Producto", back_populates="Categoria")
 
     usuarioCrea = relationship(
         "Usuario", foreign_keys=[id_usuarioCrea], overlaps="usuario_edita,productos"
     )
-    usuarioActual = relationship(
-        "Usuario", foreign_keys=[id_usuarioActual], overlaps="usuario_crea,productos"
+    id_usuarioActualiza = relationship(
+        "Usuario", foreign_keys=[id_usuarioActualiza], overlaps="usuario_crea,productos"
     )
 
     def __repr__(self):
