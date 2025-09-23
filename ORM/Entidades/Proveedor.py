@@ -18,6 +18,7 @@ class Proveedor(Base):
        segundo_apellido: El segundo apellido del proveedor.
        telefono: Como contactar al proveedor.
        correo: direccion de correo del proveedor.
+       id_producto: ID del producto que provee.
        id_usuarioCrea: El id del usuario que creo al proveedor. (Auditoria).
        id_usuarioActul: El id del usuario que actualizo al proveedor. (Auditoria).
        fecha_creacion: La fecha de creación del proveedor. (Auditoria).
@@ -42,6 +43,7 @@ class Proveedor(Base):
 
     usuarioCreador = relationship("Usuario", back_populates="proveedorCreado")
     usuarioActualizador = relationship("Usuario", back_populates="proveedorActualizado")
+    proveedores = relationship("Producto", back_populates="productoProveido")
 
     usuario_crea = relationship(
         "Usuario",

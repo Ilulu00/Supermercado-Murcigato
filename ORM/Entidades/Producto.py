@@ -40,6 +40,7 @@ class Producto(Base):
     nombre_producto = Column(String(200), nullable=False, index=True)
     precio_producto = Column(Float, nullable=False)
     stock = Column(Integer, default=0, nullable=False)
+    id_proveedor = Column(UUID(as_uuid=True), ForeignKey=("Proveedor.id_proveedor"), nullable=False)
     id_categoria = Column(UUID, ForeignKey("categorias.id"), nullable=False)
     id_proveedor = Column(UUID, ForeignKey("proveedor.id", nullable=False))
 
@@ -49,6 +50,7 @@ class Producto(Base):
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
 
     categoria = relationship("Categoria", back_populates="productos")
+
     proveedor = relationship("Proveedor", back_populates="productos")
     carritos = relationship("Detalle_carrito", back_populates="productos")
 
