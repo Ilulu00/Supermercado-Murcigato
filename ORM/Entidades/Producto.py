@@ -26,6 +26,7 @@ class Producto(Base):
         nombre_producto: Nombre del producto
         precio_producto: Precio del producto
         stock: Cantidad en stock
+        id_proveedor: ID del proveedor que trajo el producto.
         id_categoria: ID de la categoría a la que pertenece
         id_usuarioCrea: ID del usuario que creó el producto
         id_usuarioActual: ID del usuario que actualizo el producto.
@@ -39,6 +40,7 @@ class Producto(Base):
     nombre_producto = Column(String(200), nullable=False, index=True)
     precio_producto = Column(Float, nullable=False)
     stock = Column(Integer, default=0, nullable=False)
+    id_proveedor = Column(UUID(as_uuid=True), ForeignKey=("Proveedor.id_proveedor"), nullable=False)
     id_categoria = Column(UUID, ForeignKey("categorias.id"), nullable=False)
     id_usuario = Column(
         UUID(as_uuid=True), ForeignKey("Usuarios.id_usuario"), nullable=False
@@ -51,6 +53,9 @@ class Producto(Base):
     categoria = relationship("Categoria", back_populates="productos")
     usuarioCreador = relationship(
         "Usuario", back_populates="productoCreado", foreign_keys=[id_usuario]
+    )
+    productoProveido = relationship(
+        "Proveedor", back_populates="proveedores"]
     )
     carritos = relationship("Detalle_carrito", back_populates="producto")
 
