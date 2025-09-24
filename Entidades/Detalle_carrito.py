@@ -33,8 +33,12 @@ class Detalle_carrito(Base):
     id_producto = Column(UUID, ForeignKey("Productos.id_producto"), nullable=False)
     cantidad = Column(Integer, nullable=False)
 
-    carrito = relationship("Carrito", back_populates="productos")
-    producto = relationship("Producto", back_populates="carritos")
+    carrito = relationship(
+        "Carrito", back_populates="detalles", foreign_keys=[id_carrito]
+    )
+    producto = relationship(
+        "Producto", back_populates="detalles", foreign_keys=[id_producto]
+    )
 
     @property
     def subtotal(self):

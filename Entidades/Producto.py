@@ -44,9 +44,13 @@ class Producto(Base):
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
 
-    categoria = relationship("Categoria", back_populates="productos")
-    proveedor = relationship("Proveedor", back_populates="productos")
-    carritos = relationship("Detalle_carrito", back_populates="productos")
+    categoria = relationship(
+        "Categoria", back_populates="productos", foreign_keys=[id_categoria]
+    )
+    proveedor = relationship(
+        "Proveedor", back_populates="productos", foreign_keys=[id_proveedor]
+    )
+    detalles = relationship("Detalle_carrito", back_populates="producto")
 
     usuario_crea = relationship(
         "Usuario",

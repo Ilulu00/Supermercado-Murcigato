@@ -32,8 +32,10 @@ class Carrito(Base):
     fecha_crea = Column(DateTime, default=datetime.now)
     fecha_actul = Column(DateTime, onupdate=datetime.now)
 
-    carritoUsuario = relationship("Usuario", back_populates="usuarioCarrito")
-    productos = relationship("Detalle_carrito", back_populates="carrito")
+    carritoUsuario = relationship(
+        "Usuario", back_populates="usuarioCarrito", foreign_keys=[id_usuario]
+    )
+    detalles = relationship("Detalle_carrito", back_populates="carrito")
     facturaC = relationship("Factura", back_populates="carritoF")
 
     @property
