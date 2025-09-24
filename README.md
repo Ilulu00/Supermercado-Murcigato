@@ -1,3 +1,4 @@
+
 # 🛒 Supermercado Murcigato - Sistema de Gestión Avanzado
 
 Sistema de gestión de supermercado desarrollado con **Python**, **SQLAlchemy ORM** y **PostgreSQL** para el examen de Programación de Software.
@@ -120,3 +121,4 @@ python main.py
 
 **Versión**: 2.0 (Implementación ORM)  
 **Última actualización**: Enero 2025
+
