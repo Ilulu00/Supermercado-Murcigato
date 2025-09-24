@@ -6,6 +6,7 @@ Configuraciones centralizadas para la conexión a la base de datos.
 """
 
 import os
+
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -21,9 +22,9 @@ Obtener la URL completa de conexión desde las variables de entorno
 """
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Si no hay DATABASE_URL, construir desde variables individuales
+# Si no hay DATABASE_URL, usar la URL de Neon directamente
 if not DATABASE_URL:
-    raise ValueError("Se requiere DATABASE_URL en las variables de entorno")
+    DATABASE_URL = "postgresql://neondb_owner:npg_sK9nR5CfYAwB@ep-morning-lake-ad1f3v53-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 """Crear el motor de SQLAlchemy"""
 engine = create_engine(

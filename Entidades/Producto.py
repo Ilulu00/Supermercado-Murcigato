@@ -3,18 +3,14 @@ Entidad Productos
 Modelo de Producto con SQLAlchemy
 """
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    DateTime,
-    Float,
-    ForeignKey,
-)
-from database.config import Base
-from sqlalchemy.orm import relationship
 from datetime import datetime
-from uuid import UUID
+from uuid import uuid4
+
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from database.config import Base
 
 
 class Producto(Base):
@@ -36,15 +32,15 @@ class Producto(Base):
 
     __tablename__ = "Productos"
 
-    id_producto = Column(UUID, primary_key=True, autoincrement=True)
+    id_producto = Column(UUID, primary_key=True, default=uuid4, nullable=False)
     nombre_producto = Column(String(200), nullable=False, index=True)
     precio_producto = Column(Float, nullable=False)
     stock = Column(Integer, default=0, nullable=False)
-    id_categoria = Column(UUID, ForeignKey("categorias.id"), nullable=False)
-    id_proveedor = Column(UUID, ForeignKey("proveedor.id", nullable=False))
+    id_categoria = Column(UUID, ForeignKey("Categorias.id_categoria"), nullable=False)
+    id_proveedor = Column(UUID, ForeignKey("Proveedor.id_proveedor"), nullable=False)
 
-    id_usuarioCrea = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
-    id_usuarioActualiza = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=True)
+    id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
+    id_usuarioActualiza = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=True)
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
 

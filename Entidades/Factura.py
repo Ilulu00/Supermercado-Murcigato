@@ -3,13 +3,16 @@ Modelo de la entidad Factura.
 Aqui sera donde se creara la entidad Factura con SQLalchemy, asi como algunas validaciones con pydantic
 """
 
-from database.config import Base
-from sqlalchemy import Column, Float, String, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
-from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, List
-from uuid import uuid4, UUID
+from typing import List, Optional
+from uuid import uuid4
+
+from pydantic import BaseModel, Field
+from sqlalchemy import Column, DateTime, Float, ForeignKey, String
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from database.config import Base
 
 
 class Factura(Base):
@@ -26,19 +29,13 @@ class Factura(Base):
 
     __tablename__ = "Factura"
 
-    id_factura = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
-    )
+    id_factura = Column(UUID, primary_key=True, default=uuid4, nullable=False)
     metodo_pago = Column(String, nullable=False)
     subtotal = Column(Float, nullable=True)
     total = Column(Float, nullable=True)
     descuento = Column(Float, nullable=True)
-    id_carrito = Column(
-        UUID(as_uuid=True), ForeignKey("Carrito.id_carrito"), nullable=False
-    )
-    id_usuario = Column(
-        UUID(as_uuid=True), ForeignKey("Usuario.id_usuario"), nullable=False
-    )
+    id_carrito = Column(UUID, ForeignKey("Carrito.id_carrito"), nullable=False)
+    id_usuario = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
     fecha_creacion = Column(DateTime, default=datetime.now, nullable=False)
     id_usuarioCrea = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
 
@@ -90,18 +87,18 @@ class FacturaBase(BaseModel):
         max_lenght=20,
         description="Que metodo de pago utilizo el cliente.",
     )
-    subtotal: Optional[Float] = Field(None, description="")
-    total: Float = Field(
+    subtotal: Optional[float] = Field(None, description="")
+    total: float = Field(
         ..., description="Es el total de pago por todos los productos."
     )
-    descuento: Float = Field(
+    descuento: Optional[float] = Field(
         None,
         description="Cuanto descuento se aplico al total, para reducir el precio total.",
     )
-    id_carrito: UUID = Field(
+    id_carrito: str = Field(
         ..., description="Es para saber el carrito del cliente, y su contenido."
     )
-    id_usuario: UUID = Field(..., description="De quien es la factura.")
+    id_usuario: str = Field(..., description="De quien es la factura.")
     fecha_creacion: datetime = Field(
         ..., description="Fecha de creación del registro de la factura."
     )
@@ -109,14 +106,14 @@ class FacturaBase(BaseModel):
 
 class RespuestaFactura(FacturaBase):
 
-    id: int
-    metodo_pago = str
-    subtotal = Float
-    total = Float
-    descuento = Float
-    id_carrito = ForeignKey
-    id_usuario = ForeignKey
-    id_usuarioCrea: ForeignKey
+    id: str
+    metodo_pago: str
+    subtotal: Optional[float]
+    total: float
+    descuento: Optional[float]
+    id_carrito: str
+    id_usuario: str
+    id_usuarioCrea: str
     fecha_creacion: datetime
     fecha_actul: Optional[datetime] = None
 

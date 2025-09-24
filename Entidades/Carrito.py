@@ -3,13 +3,16 @@ Modelo de la entidad Carrito.
 Aqui sera donde se creara la entidad carritocon SQLalchemy, asi como algunas validaciones con pydantic
 """
 
-from database.config import Base
-from sqlalchemy import Column, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
-from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, List
-from uuid import uuid4, UUID
+from typing import List, Optional
+from uuid import uuid4
+
+from pydantic import BaseModel, Field
+from sqlalchemy import Column, DateTime, ForeignKey
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from database.config import Base
 
 
 class Carrito(Base):
@@ -23,15 +26,9 @@ class Carrito(Base):
 
     __tablename__ = "Carrito"
 
-    id_carrito = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
-    )
-    id_detalle = Column(
-        UUID(as_uuid=True), ForeignKey("Detalle_carrito.id_detalle"), nullable=False
-    )
-    id_usuario = Column(
-        UUID(as_uuid=True), ForeignKey("Usuario.id_usuario"), nullable=False
-    )
+    id_carrito = Column(UUID, primary_key=True, default=uuid4, nullable=False)
+    id_detalle = Column(UUID, ForeignKey("Detalle_carrito.id_detalle"), nullable=False)
+    id_usuario = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
     fecha_crea = Column(DateTime, default=datetime.now)
     fecha_actul = Column(DateTime, onupdate=datetime.now)
 
@@ -72,8 +69,8 @@ class Carrito(Base):
 
 
 class CarritoBase(BaseModel):
-    id_usuario: UUID = Field(..., description="Usuario al que pertence el carrito.")
-    id_producto: Optional[UUID] = Field(
+    id_usuario: str = Field(..., description="Usuario al que pertence el carrito.")
+    id_producto: Optional[str] = Field(
         None, description="Producto que hace parte del carrito."
     )
 

@@ -3,13 +3,16 @@ Modelo de la entidad Usuario.
 Aqui sera donde se creara la entidad usuario con SQLalchemy, asi como algunas validaciones con pydantic
 """
 
-from database.config import Base
-from sqlalchemy import Column, String, DateTime, Boolean
-from sqlalchemy.orm import relationship
-from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
-from typing import Optional, List
-from uuid import uuid4, UUID
+from typing import List, Optional
+from uuid import uuid4
+
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from sqlalchemy import Boolean, Column, DateTime, String
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
+from database.config import Base
 
 
 class Usuario(Base):
@@ -33,9 +36,7 @@ class Usuario(Base):
 
     __tablename__ = "Usuarios"
 
-    id_usuario = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
-    )
+    id_usuario = Column(UUID, primary_key=True, default=uuid4, nullable=False)
     primer_nombre = Column(String(50), nullable=False)
     segundo_nombre = Column(String(50), nullable=True)
     primer_apellido = Column(String(50), nullable=False)
@@ -60,7 +61,7 @@ class Usuario(Base):
     )
 
     def __repr__(self):
-        return f"<Usuario {self.id_usuario}\nNombre completo: '{self.primer_nombre," ", self.segundo_nombre, " ", self.primer_apellido," ",self.segundo_apellido}.\nDireccion: {self.direccion}.\nCorreo: {self.correo}'\nTelefono: {self.telefono}\n Rol: {self.rol}.>"
+        return f"<Usuario {self.id_usuario}\nNombre completo: '{self.primer_nombre} {self.segundo_nombre or ''} {self.primer_apellido} {self.segundo_apellido or ''}'\nDireccion: {self.direccion}\nCorreo: {self.correo}\nTelefono: {self.telefono}\nRol: {self.rol}>"
 
     def to_dict(self):
         return {
@@ -179,7 +180,7 @@ class CrearUsuario(UsuarioBase):
     correo: EmailStr = ...
     contraseña: str = ...
     telefono: Optional[str] = Field(None, max_length=20)
-    rol: String = Field(..., min_length=5, max_length=20)
+    rol: str = Field(..., min_length=5, max_length=20)
     activo: Optional[bool] = Field(True)
 
     @field_validator("primer_nombre")

@@ -3,12 +3,14 @@ Entidad Categorias
 Módelo de categorias con SQLAlchemy.
 """
 
-from database.config import Base
+from datetime import datetime
+from uuid import uuid4
+
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from datetime import datetime
-from uuid import UUID, uuid
+
+from database.config import Base
 
 
 class Categoria(Base):
@@ -27,20 +29,14 @@ class Categoria(Base):
 
     __tablename__ = "Categorias"
 
-    id_categoria = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
-    )
+    id_categoria = Column(UUID, primary_key=True, default=uuid4, index=True)
     nombre_categoria = Column(String(100), nullable=False, unique=True)
     descripcion = Column(Text, nullable=True)
 
     fecha_creacion = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now)
-    id_usuarioCrea = Column(
-        UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=False
-    )
-    id_usuarioActualiza = Column(
-        UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=True
-    )
+    id_usuarioCrea = Column(UUID, ForeignKey("usuarios.id_usuario"), nullable=False)
+    id_usuarioActualiza = Column(UUID, ForeignKey("usuarios.id_usuario"), nullable=True)
 
     productos = relationship("Producto", back_populates="Categoria")
 

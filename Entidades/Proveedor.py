@@ -1,10 +1,13 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
-from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
+from uuid import uuid4
+
+from pydantic import BaseModel, EmailStr, Field, field_validator
+from sqlalchemy import Column, DateTime, ForeignKey, String
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
 from database.config import Base
-from uuid import UUID, uuid4
 
 
 class Proveedor(Base):
@@ -26,9 +29,7 @@ class Proveedor(Base):
 
     __tablename__ = "Proveedor"
 
-    id_proveedor = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
-    )
+    id_proveedor = Column(UUID, primary_key=True, default=uuid4, nullable=False)
     primer_nombre = Column(String(50), nullable=False)
     segundo_nombre = Column(String(50), nullable=True)
     primer_apellido = Column(String(50), nullable=False)
@@ -55,7 +56,7 @@ class Proveedor(Base):
     )
 
     def __repr__(self):
-        return f"<Proveedor: {self.id_proveedor}\nNombre completo: '{self.primer_nombre," ", self.segundo_nombre, " ", self.primer_apellido," ",self.segundo_apellido}.\nCorreo: {self.correo}'\nTelefono: {self.telefono}.>"
+        return f"<Proveedor: {self.id_proveedor}\nNombre completo: '{self.primer_nombre} {self.segundo_nombre or ''} {self.primer_apellido} {self.segundo_apellido or ''}'\nCorreo: {self.correo}\nTelefono: {self.telefono}>"
 
     def to_dict(self):
         return {
@@ -94,10 +95,10 @@ class ProveedorBase(BaseModel):
         max_length=20,
         description="Número de contacto del proveedor",
     )
-    id_usuarioCrea: UUID = Field(
+    id_usuarioCrea: str = Field(
         ..., description="ID del usuario que creo el registro del proveedor."
     )
-    id_usuarioActual: Optional[UUID] = Field(
+    id_usuarioActual: Optional[str] = Field(
         None, description="ID del usuario que actualizo el registro del proveedor."
     )
     fecha_creacion: datetime = Field(
@@ -152,7 +153,7 @@ class CrearProveedor(ProveedorBase):
     correo: EmailStr = ...
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)
-    id_usuarioCrea: UUID = Field(...)
+    id_usuarioCrea: str = Field(...)
     fecha_creacion: datetime = Field(...)
 
     @field_validator("primer_nombre")
@@ -200,8 +201,8 @@ class ActualizarProveedor(ProveedorBase):
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)
-    id_usuarioActual: UUID = Field(...)
-    fecha_actualizacion: DateTime = Field(...)
+    id_usuarioActual: str = Field(...)
+    fecha_actualizacion: datetime = Field(...)
 
     @field_validator("primer_nombre")
     def val_primerNombre(cls, v):
