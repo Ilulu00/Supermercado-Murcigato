@@ -1,3 +1,5 @@
+
+
 # 🛒 Supermercado Mariana y Santiago – Examen 1 (Caso #9)
 
 Entrega del primer evento evaluativo de **Programación de Software**.  
@@ -60,3 +62,4 @@ Mariana Díaz Restrepo
 Santiago Flórez Serna
 
 Grupo 12 – Programación de Software
+

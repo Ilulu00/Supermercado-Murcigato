@@ -1,10 +1,10 @@
 """
-Modelo de la entidad Carrito.
+Modelo de la entidad DetalleCarrito.
 Aqui sera donde se creara la entidad carritocon SQLalchemy, asi como algunas validaciones con pydantic
 """
 
 from database.config import Base
-from sqlalchemy import Column, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field
 from datetime import datetime
@@ -12,43 +12,41 @@ from typing import Optional, List
 from uuid import uuid4, UUID
 
 
-class Carrito(Base):
+class Detalle_carrito(Base):
     """
-    Modelo de un carro de compras, la cual sera una tabla.
+    Modelo de los detalles de un carro de compras, donde se podran guardar mas de 1 producto.
 
-        id_carrito: identificador unico.
-        id_usuario: El id del usuario al q pertenece el carrito de compras
+        id_detalle_carrito: identificador unico.
+        id_carrito: Llave foranea que conecta al carrito con los detalles de los productos.
+        id_producto: LLave foranea que conecte los productos y sus datos con el Detalle carrito
+        cantidad: cuanta cantidad de x producto hay en el carrito.
 
     """
 
     __tablename__ = "Carrito"
 
+    id_detalle = Column(UUID(as_uuid=True), primary_key=uuid4, nullable=False)
     id_carrito = Column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
+        UUID(as_uuid=True), ForeignKey("Carrito.id_carrito"), nullable=False
     )
-    id_detalle = Column(
-        UUID(as_uuid=True), ForeignKey("Detalle_carrito.id_detalle"), nullable=False
+    id_producto = Column(
+        UUID(as_uuid=True), ForeignKey("Producto.id_producto"), nullable=False
     )
-    id_usuario = Column(
-        UUID(as_uuid=True), ForeignKey("Usuario.id_usuario"), nullable=False
-    )
-    fecha_crea = Column(DateTime, default=datetime.now)
-    fecha_actul = Column(DateTime, onupdate=datetime.now)
+    cantidad = Column(Integer, nullable=False)
 
-    carritoUsuario = relationship("Usuario", back_populates="usuarioCarrito")
-    productos = relationship("Detalle_carrito", back_populates="carrito")
-    facturaC = relationship("Factura", back_populates="carritoF")
+    carrito = relationship("Carrito", back_populates="productos")
+    producto = relationship("Producto", back_populates="carritos")
 
     @property
-    def total(self):
-        return sum(self.productos.subtotal)
+    def subtotal(self):
+        return self.cantidad * self.producto.precio_producto
 
     def __repr__(self):
         return (
-            f"<Carrito de compras {self.id_carrito}.\n"
-            f"ID del cliente: {self.carritoUsuario.id_usuario}\n"
-            f"Cantidad de productos: {len(self.productos)}"
-            f"Total a pagar: {self.precio_total}>"
+            f"<Detalle de carrito número: {self.id_detalle}.\n"
+            f"Carrito: {self.carrito.id_carrito}\n."
+            f"Producto: {self.id_producto}"
+            f"Subtotal: {self.subtotal}"
         )
 
     def to_dict(self):
@@ -67,7 +65,7 @@ class Carrito(Base):
                 }
                 for p in self.carritoProducto
             ],
-            "Precio total": self.total,
+            "Precio total": self.Precio_total,
         }
 
 
@@ -81,7 +79,7 @@ class CarritoBase(BaseModel):
 class RespuestaCarrito(CarritoBase):
 
     id: int
-    fecha_crea: datetime
+    fecha_registro: datetime
     fecha_actul: Optional[datetime] = None
 
     class Config:
