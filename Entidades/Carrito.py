@@ -36,7 +36,7 @@ class Carrito(Base):
         "Usuario", back_populates="usuarioCarrito", foreign_keys=[id_usuario]
     )
     detalles = relationship("Detalle_carrito", back_populates="carrito")
-    facturaC = relationship("Factura", back_populates="carritoF")
+    facturaC = relationship("Factura", back_populates="carritoF", foreign_keys=[])
 
     @property
     def total(self):
