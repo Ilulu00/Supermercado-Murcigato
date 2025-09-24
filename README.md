@@ -67,7 +67,7 @@ DATABASE_URL=postgresql://usuario:password@host:port/database
 
 ### 4. **Ejecutar el sistema**
 ```bash
-python ORM/main.py
+python main.py
 ```
 
 ## 🔑 Características Principales
