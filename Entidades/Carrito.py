@@ -28,7 +28,7 @@ class Carrito(Base):
 
     id_carrito = Column(UUID, primary_key=True, default=uuid4, nullable=False)
     id_detalle = Column(UUID, ForeignKey("Detalle_carrito.id_detalle"), nullable=False)
-    id_usuario = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
+    id_usuario = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
     fecha_crea = Column(DateTime, default=datetime.now)
     fecha_actul = Column(DateTime, onupdate=datetime.now)
 

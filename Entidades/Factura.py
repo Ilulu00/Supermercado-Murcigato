@@ -35,9 +35,9 @@ class Factura(Base):
     total = Column(Float, nullable=True)
     descuento = Column(Float, nullable=True)
     id_carrito = Column(UUID, ForeignKey("Carrito.id_carrito"), nullable=False)
-    id_usuario = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
+    id_usuario = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
     fecha_creacion = Column(DateTime, default=datetime.now, nullable=False)
-    id_usuarioCrea = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
+    id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
 
     carritoF = relationship("Carrito", back_populates="facturaC")
     usuarioF = relationship("Usuario", back_populates="facturaU")

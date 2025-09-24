@@ -30,7 +30,7 @@ class Detalle_carrito(Base):
 
     id_detalle = Column(UUID, primary_key=True, default=uuid4, nullable=False)
     id_carrito = Column(UUID, ForeignKey("Carrito.id_carrito"), nullable=False)
-    id_producto = Column(UUID, ForeignKey("Producto.id_producto"), nullable=False)
+    id_producto = Column(UUID, ForeignKey("Productos.id_producto"), nullable=False)
     cantidad = Column(Integer, nullable=False)
 
     carrito = relationship("Carrito", back_populates="productos")

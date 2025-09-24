@@ -36,8 +36,8 @@ class Proveedor(Base):
     segundo_apellido = Column(String(50), nullable=True)
     telefono = Column(String(20), nullable=True)
     correo = Column(String(100), nullable=False)
-    id_usuarioCrea = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=False)
-    id_usuarioActual = Column(UUID, ForeignKey("Usuario.id_usuario"), nullable=True)
+    id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
+    id_usuarioActual = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=True)
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
 

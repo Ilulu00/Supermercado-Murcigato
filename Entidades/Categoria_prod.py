@@ -35,8 +35,8 @@ class Categoria(Base):
 
     fecha_creacion = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now)
-    id_usuarioCrea = Column(UUID, ForeignKey("usuarios.id_usuario"), nullable=False)
-    id_usuarioActualiza = Column(UUID, ForeignKey("usuarios.id_usuario"), nullable=True)
+    id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
+    id_usuarioActualiza = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=True)
 
     productos = relationship("Producto", back_populates="Categoria")
 
