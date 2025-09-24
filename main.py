@@ -66,7 +66,7 @@ class SistemaGestion:
                     intentos += 1
                     continue
 
-                password = getpass.getpass("Contraseña: ")
+                password = input("Contraseña: ")
 
                 if not password:
                     print("La contraseña es obligatoria")
@@ -193,16 +193,16 @@ class SistemaGestion:
         try:
             print(f"°^°^°^° Cambiar contraseña °^°^°^°")
 
-            password_actual = getpass.getpass("Contraseña actual: ")
+            password_actual = input("Contraseña actual: ")
             if not password_actual:
                 print("El ingreso de la contraseña actual es obligatorio")
                 return
 
-            password_nueva = getpass.getpass("Nueva contraseña: ")
+            password_nueva = input("Nueva contraseña: ")
             if not password_nueva:
                 print("El ingreso de una nueva contraseña es obligatorio")
 
-            confirmar_password = getpass.getpass("Confirme la nueva contraseña: ")
+            confirmar_password = input("Confirme la nueva contraseña: ")
             if password_nueva != confirmar_password:
                 print("Las contraseñas no coinciden")
                 return
@@ -262,7 +262,7 @@ class SistemaGestion:
             correo = input("Ingrese su correo electrónico: ").strip()
             telefono = input("Ingrese su telefono: ").strip() or None
             direccion = input("Ingrese su direccion: ").strip() or None
-            password = getpass.getpass("Ingrese una contraseña: ")
+            password = input("Ingrese una contraseña: ")
             es_admin = input("¿Es administrador? (S/N): ").strip().lower() == "s"
 
             usuario = self.UsuarioCRUD.crear_usuario(
