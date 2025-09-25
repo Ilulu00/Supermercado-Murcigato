@@ -38,14 +38,14 @@ class Categoria(Base):
     id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
     id_usuarioActualiza = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=True)
 
-    productos = relationship("Producto", back_populates="Categoria")
+    productos = relationship("Producto", back_populates="categoria")
 
     usuarioCrea = relationship(
         "Usuario", foreign_keys=[id_usuarioCrea], overlaps="usuario_edita,productos"
     )
-    id_usuarioActualiza = relationship(
+    usuarioActualiza = relationship(
         "Usuario", foreign_keys=[id_usuarioActualiza], overlaps="usuario_crea,productos"
     )
 
     def __repr__(self):
-        return f"<Categoria(id_categoria={self.id_categoria}, nombre='{self.nombre}')>"
+        return f"<Categoria(id_categoria={self.id_categoria}, nombre='{self.nombre_categoria}')>"

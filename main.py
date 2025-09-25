@@ -51,50 +51,104 @@ class SistemaGestion:
         """Mostrar el Login por consola y autentificar usuario"""
         print("°" * 50)
         print("Bienvenido a Supermercado Murcigato")
-        print("Inicio de sesión")
+        while True:
+            print("\n--- Menú de acceso ---")
+            print("1. Iniciar sesión")
+            print("2. Registrar usuario")
+            print("0. Salir")
 
-        intentos: int = 0
-        max_intentos: int = 4
+            opcion = input("\nSeleccione una opción: ").strip()
 
-        while intentos < max_intentos:
-            try:
-                print(f"\nIntento {intentos + 1} de {max_intentos}")
-                nombre_usuario = input("Usuario o correo: ").strip()
+            if opcion == "1":
+                intentos: int = 0
+                max_intentos: int = 4
 
-                if not nombre_usuario:
-                    print("El campo nombre de usuario es obligatorio")
-                    intentos += 1
-                    continue
+                while intentos < max_intentos:
+                    try:
+                        print(f"\nIntento {intentos + 1} de {max_intentos}")
+                        nombre_usuario = input("Usuario o correo: ").strip()
 
-                password = input("Contraseña: ")
+                        if not nombre_usuario:
+                            print("El campo nombre de usuario es obligatorio")
+                            intentos += 1
+                            continue
 
-                if not password:
-                    print("La contraseña es obligatoria")
-                    intentos += 1
-                    continue
+                        password = input("Contraseña: ")
 
-                usuario = self.UsuarioCRUD.autenticar_usuario(nombre_usuario, password)
+                        if not password:
+                            print("La contraseña es obligatoria")
+                            intentos += 1
+                            continue
 
-                if usuario:
-                    self.usuario_actual = usuario
-                    print(f"Bienvenido {usuario.primer_nombre}")
-                    if UsuarioCRUD.es_admin:
-                        print("Tienes privilegios de administrador")
-                    return True
-                else:
-                    print("Error: información incorecta o perfil inactivo")
-                    intentos += 1
+                        usuario = self.UsuarioCRUD.autenticar_usuario(
+                            nombre_usuario, password
+                        )
 
-            except KeyboardInterrupt:
-                print("\nOperación cancelada por el usuario")
+                        if usuario:
+                            self.usuario_actual = usuario
+                            print(f"\nBienvenido {usuario.primer_nombre}")
+                            if self.UsuarioCRUD.es_admin(
+                                self.usuario_actual.id_usuario
+                            ):
+                                print("Tienes privilegios de administrador")
+                            return True
+                        else:
+                            print("Error: información incorrecta o perfil inactivo")
+                            intentos += 1
+
+                    except KeyboardInterrupt:
+                        print("\nOperación cancelada por el usuario")
+                        return False
+                    except Exception as e:
+                        print(f"\nError durante la ejecución: {e}")
+                        intentos += 1
+
+                print("\nSe ha llegado al máximo de intentos, acceso denegado")
                 return False
 
-            except Exception as e:
-                print(f"Error durante la ejecución: {e}")
-                intentos += 1
+            elif opcion == "2":
+                try:
+                    print("\n--- Registro de Usuario ---")
+                    primer_nombre = input("Primer nombre: ").strip()
+                    segundo_nombre = (
+                        input("Segundo nombre (opcional): ").strip() or None
+                    )
+                    primer_apellido = input("Primer apellido: ").strip()
+                    segundo_apellido = (
+                        input("Segundo apellido (opcional): ").strip() or None
+                    )
+                    correo = input("Correo electrónico: ").strip()
+                    telefono = input("Teléfono (opcional): ").strip() or None
+                    direccion = input("Dirección: ").strip()
+                    password = input("Contraseña: ")
 
-        print("Se ha llegado al máximo de intentos, acceso denegado")
-        return False
+                    nuevo_usuario = self.UsuarioCRUD.crear_usuario(
+                        primer_nombre=primer_nombre,
+                        segundo_nombre=segundo_nombre,
+                        primer_apellido=primer_apellido,
+                        segundo_apellido=segundo_apellido,
+                        correo=correo,
+                        telefono=telefono,
+                        direccion=direccion,
+                        contraseña=password,
+                    )
+
+                    print(
+                        f"\nUsuario {nuevo_usuario.primer_nombre} registrado con éxito!\n"
+                    )
+
+                except Exception as e:
+                    print(f"\nError al registrar usuario: {e}\n")
+
+            elif opcion == "0":
+                print("\n👋 Hasta luego!\n")
+                return False
+
+            else:
+                print("Opción inválida, intente de nuevo.")
+
+    intentos: int = 0
+    max_intentos: int = 4
 
     def menu_principal(self) -> None:
         """Mostrar menu principal a usuario después de iniciar sesión"""

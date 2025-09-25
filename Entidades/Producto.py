@@ -53,20 +53,19 @@ class Producto(Base):
     detalles = relationship("Detalle_carrito", back_populates="producto")
 
     usuario_crea = relationship(
-        "Usuario",
-        foreign_keys=[id_usuarioCrea],
-        overlaps="usuario,usuario_crea,productos",
+        "Usuario", back_populates="productosCreados", foreign_keys=[id_usuarioCrea]
     )
     usuario_Actualiza = relationship(
         "Usuario",
+        back_populates="productosActualizados",
         foreign_keys=[id_usuarioActualiza],
-        overlaps="usuario,usuario_Actualiza,productos",
     )
 
-    def __repr__(self):
-        return (
-            f"<ID Producto: {self.id_producto}\n"
-            f"Nombre del producto: {self.nombre_producto}\n"
-            f"Precio del producto: {self.precio_producto}\n"
-            f"Cantidad actual: {self.stock}"
-        )
+
+def __repr__(self):
+    return (
+        f"<ID Producto: {self.id_producto}\n"
+        f"Nombre del producto: {self.nombre_producto}\n"
+        f"Precio del producto: {self.precio_producto}\n"
+        f"Cantidad actual: {self.stock}"
+    )
