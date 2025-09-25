@@ -33,7 +33,6 @@ Sistema completo de gestión de supermercado con arquitectura moderna que incluy
 ## 🏗️ Arquitectura del Sistema
 
 ```
-ORM/
 ├── Entidades/          # Modelos SQLAlchemy
 │   ├── Usuario.py      # Gestión de usuarios
 │   ├── Producto.py     # Gestión de productos

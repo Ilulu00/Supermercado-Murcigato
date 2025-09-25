@@ -85,7 +85,7 @@ class UsuarioCRUD:
         if not contraseña:
             raise ValueError("La contraseña es obligatoria")
         else:
-            contraseña_hash(contraseña)
+            self.hash_contraseña(contraseña)
 
         if telefono and not self.validar_telefono(telefono):
             raise ValueError("Formato de teléfono inválido")
@@ -96,7 +96,7 @@ class UsuarioCRUD:
         contraseña_hash = self.hash_contraseña(contraseña)
 
         usuario = Usuario(
-            Primer_nombre=primer_nombre.lower().strip(),
+            primer_nombre=primer_nombre.lower().strip(),
             segundo_nombre=segundo_nombre.strip() if segundo_nombre else None,
             primer_apellido=primer_apellido.strip(),
             segundo_apellido=segundo_apellido.strip() if segundo_apellido else None,
@@ -175,7 +175,7 @@ class UsuarioCRUD:
         if not self.verificar_contraseña(contraseña_actual, usuario.contraseña):
             return False
 
-        nueva_contraseña = self.hash_contraseña(nueva_contraseña)
+        usuario.contraseña = self.hash_contraseña(nueva_contraseña)
         self.db.commit()
         return True
 
@@ -239,7 +239,11 @@ class UsuarioCRUD:
         Returns:
             Lista de los usuarios administradores
         """
-        return self.db.query(Usuario).filter(Usuario.rol == "administrador").all()
+        return (
+            self.db.query(Usuario)
+            .filter(Usuario.rol == ("administrador").lower())
+            .all()
+        )
 
     def es_admin(self, id_usuario: UUID) -> bool:
         """Módulo para verificar si un usuario es administrador

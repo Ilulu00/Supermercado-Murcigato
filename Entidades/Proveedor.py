@@ -41,18 +41,15 @@ class Proveedor(Base):
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
 
-    usuarioCreador = relationship("Usuario", back_populates="proveedorCreado")
-    usuarioActualizador = relationship("Usuario", back_populates="proveedorActualizado")
+    productos = relationship("Producto", back_populates="proveedor")
 
-    usuario_crea = relationship(
-        "Usuario",
-        foreign_keys=[id_usuarioCrea],
-        overlaps="Usuario,usuario_edita,proveedor",
+    usuarioCreador = relationship(
+        "Usuario", back_populates="proveedorCreado", foreign_keys=[id_usuarioCrea]
     )
-    usuario_edita = relationship(
+    usuarioActualizador = relationship(
         "Usuario",
+        back_populates="proveedorActualizado",
         foreign_keys=[id_usuarioActual],
-        overlaps="usuario,usuario_crea,proveedor",
     )
 
     def __repr__(self):

@@ -50,14 +50,32 @@ class Usuario(Base):
     fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actul = Column(DateTime, onupdate=datetime.now)
 
-    proveedorCreado = relationship("Proveedor", back_populates="usuarioCreador")
+    proveedorCreado = relationship(
+        "Proveedor",
+        back_populates="usuarioCreador",
+        foreign_keys="[Proveedor.id_usuarioCrea]",
+    )
     proveedorActualizado = relationship(
-        "Proveedor", back_populates="usuarioActualizador"
+        "Proveedor",
+        back_populates="usuarioActualizador",
+        foreign_keys="[Proveedor.id_usuarioActual]",
     )
     usuarioCarrito = relationship("Carrito", back_populates="carritoUsuario")
-    facturaU = relationship("Factura", back_populates="usuarioF")
-    productoCreado = relationship(
-        "Producto", back_populates=" usuarioCreador", foreign_keys="Producto.usuario_id"
+    facturaU = relationship(
+        "Factura", back_populates="usuarioF", foreign_keys="[Factura.id_usuario]"
+    )
+    facturas_creadas = relationship(
+        "Factura", back_populates="usuarioCrea", foreign_keys="[Factura.id_usuarioCrea]"
+    )
+    productosCreados = relationship(
+        "Producto",
+        back_populates="usuario_crea",
+        foreign_keys="[Producto.id_usuarioCrea]",
+    )
+    productosActualizados = relationship(
+        "Producto",
+        back_populates="usuario_Actualiza",
+        foreign_keys="[Producto.id_usuarioActualiza]",
     )
 
     def __repr__(self):
