@@ -72,32 +72,3 @@ class Carrito(Base):
             ],
             "Precio total": self.total,
         }
-
-
-class CarritoBase(BaseModel):
-    id_usuario: str = Field(..., description="Usuario al que pertence el carrito.")
-    id_producto: Optional[str] = Field(
-        None, description="Producto que hace parte del carrito."
-    )
-
-
-class RespuestaCarrito(CarritoBase):
-
-    id: int
-    fecha_crea: datetime
-    fecha_actul: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
-
-class ListaCarritos(BaseModel):
-
-    carrito: List[RespuestaCarrito]
-    total: int
-    pagina: int
-    por_pagina: int
-
-    class Config:
-        from_attributes = True

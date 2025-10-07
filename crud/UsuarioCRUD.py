@@ -15,7 +15,7 @@ from Entidades.Usuario import Usuario
 class UsuarioCRUD:
     def __init__(self, db: Session):
         self.db = db
-
+    
     @staticmethod
     def hash_contraseña(contraseña: str) -> str:
         salt = bcrypt.gensalt()
