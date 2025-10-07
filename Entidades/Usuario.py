@@ -289,14 +289,3 @@ class RespuestaUsuario(UsuarioBase):
     class Config:
         from_attributes = True
         json_encoders = {datetime: lambda v: v.isoformat()}
-
-
-class ListaUsuarios(BaseModel):
-
-    usuarios: List[RespuestaUsuario]
-    total: int
-    pagina: int
-    por_pagina: int
-
-    class Config:
-        from_attributes = True
