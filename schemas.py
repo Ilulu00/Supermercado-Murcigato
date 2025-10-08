@@ -23,8 +23,26 @@ class RespuestaCarrito(CarritoBase):
         from_attributes = True
 
 
-class FacturaBase(BaseModel):
+class DetalleCarritoBase(BaseModel):
+    id_carrito: UUID
+    id_producto: UUID
+    cantidad: int
 
+
+class DetalleCarritoCreate(DetalleCarritoBase):
+    pass
+
+
+class DetalleCarritoResponse(DetalleCarritoBase):
+    id: UUID
+    subtotal: int
+
+    class Config:
+        orm_mode = True
+
+
+class FacturaBase(BaseModel):
+    id_factura: UUID
     metodo_pago: str
     subtotal: Optional[float]
     total: float
@@ -36,7 +54,7 @@ class FacturaBase(BaseModel):
 
 class RespuestaFactura(FacturaBase):
 
-    id: str
+    id_factura: UUID
     metodo_pago: str
     subtotal: Optional[float]
     total: float

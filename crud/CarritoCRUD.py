@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from Entidades.Carrito import Carrito
 from Entidades.Detalle_carrito import Detalle_carrito
+from Entidades.Producto import Producto
 
 
 class CarritoCRUD:
