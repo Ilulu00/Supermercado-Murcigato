@@ -10,17 +10,20 @@ from pydantic import BaseModel, EmailStr
 
 class CarritoBase(BaseModel):
     id_usuario: UUID
-    id_producto: UUID
 
 
 class RespuestaCarrito(CarritoBase):
 
     id_carrito: UUID
     fecha_crea: datetime
-    fecha_actul: Optional[datetime] = None
+    fecha_actual: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+
+
+class CrearCarrito(CarritoBase):
+    pass
 
 
 class DetalleCarritoBase(BaseModel):
@@ -34,11 +37,10 @@ class DetalleCarritoCreate(DetalleCarritoBase):
 
 
 class DetalleCarritoResponse(DetalleCarritoBase):
-    id: UUID
     subtotal: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FacturaBase(BaseModel):
@@ -55,15 +57,7 @@ class FacturaBase(BaseModel):
 class RespuestaFactura(FacturaBase):
 
     id_factura: UUID
-    metodo_pago: str
-    subtotal: Optional[float]
-    total: float
-    descuento: Optional[float]
-    id_carrito: str
-    id_usuario: str
-    id_usuarioCrea: str
-    fecha_creacion: datetime
-    fecha_actul: Optional[datetime] = None
+    fecha_actual: Optional[datetime] = None
 
     class Config:
         from_attributes = True

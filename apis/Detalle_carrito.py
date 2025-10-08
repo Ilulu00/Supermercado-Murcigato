@@ -1,5 +1,6 @@
 """
 Endpoints de Detalle_carrito. API de Detalle_carrito
+
 """
 
 from typing import List
@@ -8,11 +9,11 @@ from uuid import UUID
 from crud.CarritoCRUD import CarritoCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import DetalleCarritoBase, DetalleCarritoCreate, DetalleCarritoResponse
+from schemas import DetalleCarritoCreate, DetalleCarritoResponse
 from sqlalchemy.orm import Session
 import Entidades
 
-router = APIRouter(prefix="/detalle_carrito", tags=["Detalle_carrito"])
+router = APIRouter(prefix="/detalles_carrito", tags=["Detalle_carrito"])
 
 
 @router.post("/", response_model=DetalleCarritoResponse)
@@ -59,6 +60,7 @@ def crear_Detalle_carrito(detalle: DetalleCarritoCreate, db: Session = Depends(g
 def buscar_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
     """
     Módulo para mostrar los detalles de un carrito
+
     """
     detalles = (
         db.query(Entidades.Detalle_carrito)
@@ -79,6 +81,7 @@ def actualizar_detalle(
 ):
     """
     Módulo para actualizar la cantidad de un producto dentro de un detalle
+
     """
     db_detalle = (
         db.query(Entidades.Detalle_carrito)

@@ -91,11 +91,13 @@ class CarritoCRUD:
             .filter(Detalle_carrito.id_carrito == id_carrito)
             .all()
         )
+        
+        total = sum(det.subtotal for det in detalle)
 
         return {
             "carrito": carrito,
             "productos": detalle,
-            "total": Detalle_carrito.subtotal,
+            "total": total,
         }
 
     def actualizar_producto(
