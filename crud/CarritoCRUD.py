@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from Entidades.Carrito import Carrito
 from Entidades.Detalle_carrito import Detalle_carrito
+from Entidades.Producto import Producto
 
 
 class CarritoCRUD:
@@ -90,11 +91,13 @@ class CarritoCRUD:
             .filter(Detalle_carrito.id_carrito == id_carrito)
             .all()
         )
+        
+        total = sum(det.subtotal for det in detalle)
 
         return {
             "carrito": carrito,
             "productos": detalle,
-            "total": Detalle_carrito.subtotal,
+            "total": total,
         }
 
     def actualizar_producto(
