@@ -3,13 +3,79 @@ Esquemas pydantic para la respuesta de la API
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
 
+class UsuarioBase(BaseModel):
+    primerNombre: str
+    segundoNombre: Optional[str] = None
+    primerApellido: str
+    segundoApellido: Optional[str] = None
+    direccion: str
+    telefono: Optional[str] = None
+    correo: str
+    telefono: Optional[str] = None
+    contraseña: str
+    rol: str
+    activo: bool
+
+
+class UsuarioCreate(UsuarioBase):
+    id_usuario: UUID
+    primer_nombre: str
+    primer_apellido: str
+    correo: str
+    contraseña: str
+    direccion: str
+    segundo_nombre: Optional[str] = None
+    segundo_apellido: Optional[str] = None
+    telefono: Optional[str] = None
+    rol: str = "Cliente"
+
+
+class UsuarioUpdate(BaseModel):
+    primerNombre: Optional[str] = None
+    segundoNombre: Optional[str] = None
+    primerApellido: Optional[str] = None
+    segundoApellido: Optional[str] = None
+    correo: Optional[EmailStr] = None
+    telefono: Optional[str] = None
+    rol: Optional[str] = "Cliente"
+    activo: Optional[bool] = None
+
+
+class UsuarioResponse(UsuarioBase):
+    id_usuario: UUID
+    activo: bool
+    fecha_creacion: datetime
+    fecha_edicion: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class UsuarioLogin(BaseModel):
+    correo: str
+    contraseña: str
+
+
+class CambioContraseña(BaseModel):
+    contraseña_actual: str
+    nueva_contraseña: str
+
+
+class loginResponse(BaseModel):
+    contraseña: str
+    correo: UsuarioResponse
+
+
 class CarritoBase(BaseModel):
     id_usuario: UUID
+    id_usuario: UUID
+    fecha_crea: datetime
+    fecha_actual: Optional[datetime] = None
 
 
 class RespuestaCarrito(CarritoBase):
@@ -45,13 +111,17 @@ class DetalleCarritoResponse(DetalleCarritoBase):
 
 class FacturaBase(BaseModel):
     id_factura: UUID
+    id_usuario: UUID
+    id_carrito: UUID
     metodo_pago: str
     subtotal: Optional[float]
-    total: float
     descuento: Optional[float]
-    id_carrito: UUID
-    id_usuario: UUID
+    total: float
     fecha_creacion: datetime
+
+
+class CrearFactura(FacturaBase):
+    pass
 
 
 class RespuestaFactura(FacturaBase):
@@ -61,92 +131,6 @@ class RespuestaFactura(FacturaBase):
 
     class Config:
         from_attributes = True
-
-
-class RespuestaAPI(BaseModel):
-    mensaje: str
-    exito: bool = True
-    datos: Optional[dict] = None
-
-
-class RespuestaError(BaseModel):
-    mensaje: str
-    exito: bool = False
-    error: str
-    codigo: int
-
-
-"""
-Modelos base para usuario
-"""
-
-
-class UsuarioBase(BaseModel):
-    primerNombre: str
-    segundoNombre: Optional[str] = None
-    primerApellido: str
-    segundoApellido: Optional[str] = None
-    direccion: str
-    telefono: Optional[str] = None
-    correo: str
-    telefono: Optional[str] = None
-    contraseña: str
-    rol = str
-    activo: bool
-
-
-class UsuarioCreate(UsuarioBase):
-    id_usuario: UUID
-    primer_nombre: str
-    primer_apellido: str
-    correo: str
-    contraseña: str
-    direccion: str
-    segundo_nombre: Optional[str] = None
-    segundo_apellido: Optional[str] = None
-    telefono: Optional[str] = None
-    rol: str = "Cliente"
-
-
-class UsuarioUpdate(BaseModel):
-    primerNombre: Optional[str] = None
-    segundoNombre: Optional[str] = None
-    primerApellido: Optional[str] = None
-    segundoApellido: Optional[str] = None
-    correo: Optional[EmailStr] = None
-    telefono: Optional[str] = None
-    rol: Optional[str] = "Cliente"
-    activo: Optional[bool] = None
-
-
-class UsuarioResponse(UsuarioBase):
-    id: UUID
-    activo: bool
-    fecha_creacion: datetime
-    fecha_edicion: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-
-
-class UsuarioLogin(BaseModel):
-    correo: str
-    contraseña: str
-
-
-class CambioContraseña(BaseModel):
-    contraseña_actual: str
-    nueva_contraseña: str
-
-
-class loginResponse(BaseModel):
-    contraseña: str
-    correo: UsuarioResponse
-
-
-"""
-Modelo base para categoría
-"""
 
 
 class CategoriaBase(BaseModel):
@@ -171,11 +155,6 @@ class CategoriaResponse(CategoriaBase):
 
     class Config:
         from_attributes = True
-
-
-"""
-Modelo base para producto
-"""
 
 
 class ProductoBase(BaseModel):
@@ -208,19 +187,14 @@ class ProductoResponse(ProductoBase):
         from_attributes = True
 
 
-"""
-Modelos base para proveedor
-"""
-
-
 class ProveedorBase(BaseModel):
     id_proveedor: UUID
-    primer_nombre = str
-    segundo_nombre = Optional[str] = None
-    primer_apellido = str
-    segundo_apellido = Optional[str] = None
-    telefono = Optional[str] = None
-    correo = str
+    primer_nombre: str
+    segundo_nombre: Optional[str] = None
+    primer_apellido: str
+    segundo_apellido: Optional[str] = None
+    telefono: Optional[str] = None
+    correo: str
 
 
 class ProveedorCreate(ProveedorBase):
@@ -245,11 +219,6 @@ class ProveedorResponse(ProveedorBase):
         from_attributes = True
 
 
-"""
-Modelos de respuesta con relaciones
-"""
-
-
 class ProductoConCategoria(ProductoResponse):
     categoria: CategoriaResponse
 
@@ -264,3 +233,28 @@ class CategoriaConProductos(CategoriaResponse):
 
 class ProductoConProveedor(ProductoResponse):
     proveedor: list[ProveedorResponse] = []
+
+
+class UsuarioConCarrito(UsuarioResponse):
+    carrito: RespuestaCarrito
+
+
+class CarritoConFactura(RespuestaCarrito):
+    factura: RespuestaFactura
+
+
+class CarritoConDetalles(RespuestaCarrito):
+    detalles: List[DetalleCarritoResponse] = []
+
+
+class RespuestaAPI(BaseModel):
+    mensaje: str
+    exito: bool = True
+    datos: Optional[dict] = None
+
+
+class RespuestaError(BaseModel):
+    mensaje: str
+    exito: bool = False
+    error: str
+    codigo: int

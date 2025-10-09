@@ -8,7 +8,7 @@ from uuid import UUID
 from crud.CarritoCRUD import CarritoCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import CarritoBase, CrearCarrito, RespuestaCarrito, DetalleCarritoResponse
+from schemas import CrearCarrito, RespuestaCarrito, DetalleCarritoResponse
 from sqlalchemy.orm import Session
 import Entidades
 
@@ -31,7 +31,7 @@ def crear_carrito_de_compras(
     return carrito
 
 
-@router.get("/", response_model=list[DetalleCarritoResponse])
+@router.get("/", response_model=List[DetalleCarritoResponse])
 def listar_carritos(db: Session = Depends(get_db)):
     """
     Módulo para listar todos los carritos que existan
@@ -41,6 +41,6 @@ def listar_carritos(db: Session = Depends(get_db)):
     if not detalles:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No existen detalles de productos.",
+            detail="No se encontraron detalles de productos.",
         )
     return detalles
