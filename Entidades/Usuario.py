@@ -48,7 +48,7 @@ class Usuario(Base):
     rol = Column(String(20), default="Cliente", nullable=False)
     activo = Column(Boolean, default=True, nullable=False)
     fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
-    fecha_actul = Column(DateTime, onupdate=datetime.now)
+    fecha_actual = Column(DateTime, onupdate=datetime.now)
 
     proveedorCreado = relationship(
         "Proveedor",
@@ -61,6 +61,7 @@ class Usuario(Base):
         foreign_keys="[Proveedor.id_usuarioActual]",
     )
     usuarioCarrito = relationship("Carrito", back_populates="carritoUsuario")
+
     facturaU = relationship(
         "Factura", back_populates="usuarioF", foreign_keys="[Factura.id_usuario]"
     )
@@ -98,7 +99,7 @@ class Usuario(Base):
                 self.fecha_registro.isoformat() if self.fecha_registro else None
             ),
             "Fecha actualizacion": (
-                self.fecha_actul.isoformat() if self.fecha_actul else None
+                self.fecha_actual.isoformat() if self.fecha_actual else None
             ),
         }
 
@@ -116,10 +117,10 @@ class UsuarioBase(BaseModel):
     segundo_apellido: Optional[str] = Field(
         None, min_length=3, max_length=15, description="segundo apellido del usuario"
     )
-    direccion: EmailStr = Field(
+    direccion: str = Field(
         ..., min_length=2, max_length=100, description="Lugar de residencia del usuario"
     )
-    correo: str = Field(
+    correo: EmailStr = Field(
         ..., min_length=5, max_length=150, description="Correo electronico del usuario"
     )
     contraseña: str = Field(
@@ -269,23 +270,3 @@ class ActualizarUsuario(UsuarioBase):
             ):
                 raise ValueError("Formato de telefono no apto.")
         return v
-
-
-class RespuestaUsuario(UsuarioBase):
-
-    id: int
-    primer_nombre: str
-    segundo_nombre: Optional[str] = None
-    primer_apellido: str
-    segundo_apellido: Optional[str] = None
-    direccion: str
-    correo: EmailStr
-    contraseña: str
-    telefono: Optional[str]
-    rol: str
-    fecha_registro: datetime
-    fecha_actul: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-        json_encoders = {datetime: lambda v: v.isoformat()}

@@ -4,10 +4,8 @@ Aqui sera donde se creara la entidad carritocon SQLalchemy, asi como algunas val
 """
 
 from datetime import datetime
-from typing import List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
 from sqlalchemy import Column, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -29,7 +27,7 @@ class Carrito(Base):
     id_carrito = Column(UUID, primary_key=True, default=uuid4, nullable=False)
     id_usuario = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
     fecha_crea = Column(DateTime, default=datetime.now)
-    fecha_actul = Column(DateTime, onupdate=datetime.now)
+    fecha_actual = Column(DateTime, onupdate=datetime.now)
 
     carritoUsuario = relationship(
         "Usuario", back_populates="usuarioCarrito", foreign_keys=[id_usuario]

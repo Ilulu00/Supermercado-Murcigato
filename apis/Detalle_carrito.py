@@ -56,7 +56,7 @@ def crear_Detalle_carrito(detalle: DetalleCarritoCreate, db: Session = Depends(g
     return nuevo_detalle
 
 
-@router.get("/{id_carrito}", response_model=list[DetalleCarritoResponse])
+@router.get("/{id_carrito}", response_model=List[DetalleCarritoResponse])
 def buscar_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
     """
     Módulo para mostrar los detalles de un carrito
