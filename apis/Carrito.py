@@ -41,6 +41,6 @@ def listar_carritos(db: Session = Depends(get_db)):
     if not detalles:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No existen detalles de productos.",
+            detail="No se encontraron detalles de productos.",
         )
     return detalles

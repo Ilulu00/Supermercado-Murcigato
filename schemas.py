@@ -54,6 +54,10 @@ class FacturaBase(BaseModel):
     fecha_creacion: datetime
 
 
+class CrearFactura(FacturaBase):
+    pass
+
+
 class RespuestaFactura(FacturaBase):
 
     id_factura: UUID
