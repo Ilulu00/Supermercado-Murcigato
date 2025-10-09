@@ -5,7 +5,9 @@ Sistema de gestión de supermercado desarrollado con **Python**, **SQLAlchemy OR
 
 ## 📌 Descripción
 
-Sistema completo de gestión de supermercado con arquitectura moderna que incluye:
+El Supermercado Murcigato es un sistema de gestión integral que permite la administración completa de productos, usuarios, facturación y carrito de compras, implementando una arquitectura moderna con ORM, API REST y módulos independientes. En este sistema se incluyen algunos módulos principales como:
+
+## 🧩 Módulos principales
 
 ### 👤 **Usuario (Cliente)**
 - Autenticación segura con hash de contraseñas
@@ -24,26 +26,41 @@ Sistema completo de gestión de supermercado con arquitectura moderna que incluy
 ## 🚀 Tecnologías Utilizadas
 
 - **Python 3** - Lenguaje principal
+- **FastAPI** - Framework para el desarrollo de APIs
 - **SQLAlchemy 2.0.23** - ORM avanzado
 - **PostgreSQL** - Base de datos (Neon Cloud)
 - **Pydantic** - Validación de datos
 - **Alembic** - Migraciones de base de datos
 - **python-dotenv** - Gestión de variables de entorno
+- **Uvicorn** - Servidor ASGI 
 
 ## 🏗️ Arquitectura del Sistema
 
 ```
-├── Entidades/          # Modelos SQLAlchemy
-│   ├── Usuario.py      # Gestión de usuarios
-│   ├── Producto.py     # Gestión de productos
-│   ├── Categoria_prod.py # Categorías
-│   ├── Carrito.py      # Carrito de compras
-│   ├── Factura.py      # Sistema de facturación
-│   └── Proveedor.py    # Gestión de proveedores
-├── CRUD/               # Operaciones de base de datos
-├── auth/               # Sistema de autenticación
-├── database/           # Configuración de BD
-└── main.py            # Sistema principal
+├── 📂 apis/                  # Routers de las entidades
+│   ├── Usuario.py
+│   ├── Producto.py
+│   ├── Categoria_prod.py
+│   ├── Carrito.py
+│   ├── Factura.py
+│   ├── Proveedor.py
+│   └── Detalle_carrito.py
+├── 📂 Entidades/             # Modelos SQLAlchemy
+│   ├── Usuario.py
+│   ├── Producto.py
+│   ├── Categoria_prod.py
+│   ├── Carrito.py
+│   ├── Factura.py
+│   ├── Detalle_carrito.py
+│   └── Proveedor.py
+├── 📁 crud/                  # Lógica CRUD para las entidades
+├── 📁 auth/                  # Sistema de autenticación
+├── 📂 database/              # Configuración de la base de datos
+│   └── config.py
+├── .env                   # Variables de entorno (URL BD, etc.)
+├── Requerimientos.txt     # Dependencias del proyecto
+├── 👑 main.py             # Punto de entrada del sistema
+└── schemas.py             # Esquemas de las entidades
 ```
 
 ## 🔧 Instalación y Configuración
@@ -64,6 +81,7 @@ Crear archivo `.env` en la raíz del proyecto:
 ```env
 DATABASE_URL=postgresql://usuario:password@host:port/database
 ```
+<sub> Si depronto ya esta creado el archivo .env, omite este paso.</sub>
 
 ### 4. **Ejecutar el sistema**
 ```bash
@@ -88,7 +106,6 @@ python main.py
 
 ### **Base de Datos**
 - **PostgreSQL** en la nube (Neon)
-- **Migraciones automáticas** con Alembic
 - **Relaciones complejas** entre entidades
 - **UUIDs** como identificadores únicos
 
@@ -97,7 +114,7 @@ python main.py
 - **Mariana Díaz Restrepo**
 - **Santiago Flórez Serna**
 
-**Grupo 12** - Programación de Software
+**✨ Grupo 12** - Programación de Software
 
 ## 📊 Estado del Proyecto
 
@@ -107,23 +124,18 @@ python main.py
 - ✅ Base de datos PostgreSQL configurada
 - ✅ Arquitectura modular implementada
 - ✅ Sistema de roles funcional
+- ✅ Modelo de APIs en Swagger UI
+- ✅ APIs hechas con fastAPI
 
 ## 🔄 Próximas Mejoras
 
-- [ ] Interfaz web con FastAPI
-- [ ] API REST completa
 - [ ] Sistema de notificaciones
 - [ ] Reportes y analytics
 - [ ] Integración con sistemas de pago
 
 ---
 
-**Versión**: 2.0 (Implementación ORM)  
-**Última actualización**: Enero 2025
+**Versión**: 3.0 (Implementacion de fastAPIs)  
+**Última actualización**: Octubre 2025
 
-
-# Supermercado Murcigato
-Rama qa, llamada tambien rama de calidad. Aunque en nuestro proyecto no sirva de mucho, no entra en la parte laboral de algun proyecto de software.
-- Nuestro grupo esta conformado por: Mariana Diaz Restrepo y Santiago Florez Serna, somos el grupo 12.
-- Este proyecto trata de un sistema de supermercado, el cual se llama "Murcigato".
 
