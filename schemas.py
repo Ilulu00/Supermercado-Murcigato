@@ -3,7 +3,7 @@ Esquemas pydantic para la respuesta de la API
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
@@ -65,6 +65,18 @@ class RespuestaFactura(FacturaBase):
 
     class Config:
         from_attributes = True
+
+
+class UsuarioConCarrito(UsuarioResponse):
+    carrito: RespuestaCarrito
+
+
+class CarritoConFactura(RespuestaCarrito):
+    factura: RespuestaFactura
+
+
+class CarritoConDetalles(RespuestaCarrito):
+    detalles: List[DetalleCarritoResponse] = []
 
 
 class RespuestaAPI(BaseModel):
