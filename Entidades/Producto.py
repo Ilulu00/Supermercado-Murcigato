@@ -24,8 +24,6 @@ class Producto(Base):
         stock: Cantidad en stock
         id_categoria: ID de la categoria a la que pertenece
         id_proveedor: ID del provedor del producto
-        id_usuarioCrea: ID del usuario que creó el producto
-        id_usuarioActualiza: ID del usuario que actualizo el producto.
         fecha_creacion: Fecha y hora de creación
         fecha_actualizacion: Fecha y hora de última actualización
     """
@@ -39,8 +37,6 @@ class Producto(Base):
     id_categoria = Column(UUID, ForeignKey("Categorias.id_categoria"), nullable=False)
     id_proveedor = Column(UUID, ForeignKey("Proveedor.id_proveedor"), nullable=False)
 
-    id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
-    id_usuarioActualiza = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=True)
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
 
@@ -51,15 +47,6 @@ class Producto(Base):
         "Proveedor", back_populates="productos", foreign_keys=[id_proveedor]
     )
     detalles = relationship("Detalle_carrito", back_populates="producto")
-
-    usuario_crea = relationship(
-        "Usuario", back_populates="productosCreados", foreign_keys=[id_usuarioCrea]
-    )
-    usuario_Actualiza = relationship(
-        "Usuario",
-        back_populates="productosActualizados",
-        foreign_keys=[id_usuarioActualiza],
-    )
 
 
 def __repr__(self):
