@@ -27,7 +27,9 @@ class Proveedor(Base):
 
     __tablename__ = "Proveedor"
 
-    id_proveedor = Column(UUID, primary_key=True, default=uuid4, nullable=False)
+    id_proveedor = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
+    )
     primer_nombre = Column(String(50), nullable=False)
     segundo_nombre = Column(String(50), nullable=True)
     primer_apellido = Column(String(50), nullable=False)
@@ -213,31 +215,3 @@ class ActualizarProveedor(ProveedorBase):
             ):
                 raise ValueError("Formato de telefono no apto.")
         return v
-
-
-class RespuestaProveedor(ProveedorBase):
-
-    id: int
-    Primer_nombre: str
-    Segundo_nombre: Optional[str] = None
-    Primer_apellido: str
-    Segundo_apellido: Optional[str] = None
-    Correo: EmailStr
-    Telefono: Optional[str] = None
-    fecha_creacion: datetime
-    fecha_actulizacion: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-        json_encoders = {datetime: lambda v: v.isoformat()}
-
-
-class ListaProveedores(BaseModel):
-
-    proveedores: List[RespuestaProveedor]
-    total: int
-    pagina: int
-    por_pagina: int
-
-    class Config:
-        from_attributes = True

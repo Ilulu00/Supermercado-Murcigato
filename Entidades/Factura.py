@@ -29,23 +29,24 @@ class Factura(Base):
 
     __tablename__ = "Factura"
 
-    id_factura = Column(UUID, primary_key=True, default=uuid4, nullable=False)
+    id_factura = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
+    )
     metodo_pago = Column(String, nullable=False)
     subtotal = Column(Float, nullable=True)
     total = Column(Float, nullable=True)
     descuento = Column(Float, nullable=True)
-    id_carrito = Column(UUID, ForeignKey("Carrito.id_carrito"), nullable=False)
-    id_usuario = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
+    id_carrito = Column(
+        UUID(as_uuid=True), ForeignKey("Carrito.id_carrito"), nullable=False
+    )
+    id_usuario = Column(
+        UUID(as_uuid=True), ForeignKey("Usuarios.id_usuario"), nullable=False
+    )
     fecha_creacion = Column(DateTime, default=datetime.now, nullable=False)
-    id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
 
     carritoF = relationship("Carrito", back_populates="facturaC")
     usuarioF = relationship(
         "Usuario", back_populates="facturaU", foreign_keys=[id_usuario]
-    )
-
-    usuarioCrea = relationship(
-        "Usuario", foreign_keys=[id_usuarioCrea], back_populates="facturas_creadas"
     )
 
     def __repr__(self):

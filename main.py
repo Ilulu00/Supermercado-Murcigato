@@ -16,7 +16,6 @@ from apis import (
 from database.config import create_tables
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from decouple import config
 
 """ Crear la aplicación FastAPI """
 app = FastAPI(
@@ -28,15 +27,10 @@ app = FastAPI(
 )
 
 """ Configurar CORS para permitir peticiones desde el frontend """
-ENV = config("ENV", default="dev")
-if ENV == "prod":
-    origins = config("PROD_ORIGINS").split(",")
-else:
-    origins = config("DEV_ORIGINS").split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
