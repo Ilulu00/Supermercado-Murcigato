@@ -21,7 +21,6 @@ class ProductoCRUD:
         stock: int,
         id_categoria: UUID,
         id_usuario: UUID,
-        id_usuarioCrea: UUID = None,
     ) -> Producto:
         """
         Crear un nuevo producto con validaciones
@@ -32,7 +31,6 @@ class ProductoCRUD:
             stock: Cantidad en stock, no puede ser negativo al igual que el precio.
             id_categoria: UUID de la categoría
             id_usuario: UUID del usuario propietario
-            id_usuarioCrea: UUID del usuario que crea el producto
 
         Returns:
             Producto creado
@@ -70,16 +68,12 @@ class ProductoCRUD:
         if not usuario:
             raise ValueError("El usuario especificado no existe")
 
-        if id_usuario_crea is None:
-            id_usuario_crea = id_usuario
-
         producto = Producto(
             nombre_producto=nombre_producto.strip(),
             precio_producto=precio_producto,
             stock=stock,
             id_categoria=id_categoria,
             id_usuario=id_usuario,
-            id_usuarioCrea=id_usuarioCrea,
         )
         self.db.add(producto)
         self.db.commit()
@@ -155,15 +149,12 @@ class ProductoCRUD:
             .all()
         )
 
-    def actualizar_producto(
-        self, id_producto: UUID, id_usuarioActual: UUID = None, **kwargs
-    ) -> Optional[Producto]:
+    def actualizar_producto(self, id_producto: UUID, **kwargs) -> Optional[Producto]:
         """
         Actualizar un producto con validaciones
 
         Args:
             id_producto: UUID del producto
-            id_usuarioActual: UUID del usuario que edita
             **kwargs: Campos a actualizar
 
         Returns:
@@ -215,20 +206,6 @@ class ProductoCRUD:
             )
             if not usuario:
                 raise ValueError("El usuario especificado no existe")
-
-        if id_usuarioActual is None:
-            from Entidades.Usuario import Usuario
-
-            admin = (
-                self.db.query(Usuario).filter(Usuario.rol == "Administrador").first()
-            )
-            if not admin:
-                raise ValueError(
-                    "No se encontró un usuario administrador para editar el producto"
-                )
-            id_usuarioActual = admin.id_usuario
-
-        producto.id_usuarioActual = id_usuarioActual
 
         for key, value in kwargs.items():
             if hasattr(producto, key):

@@ -16,13 +16,19 @@ class UsuarioBase(BaseModel):
     direccion: str
     telefono: Optional[str] = None
     correo: str
-    contraseña: str
-    rol: str = "Cliente"
+    telefono: Optional[str] = None
     activo: bool
 
 
 class UsuarioCreate(UsuarioBase):
-    pass
+    id_usuario: UUID
+    primer_nombre: str
+    primer_apellido: str
+    correo: str
+    direccion: str
+    segundo_nombre: Optional[str] = None
+    segundo_apellido: Optional[str] = None
+    telefono: Optional[str] = None
 
 
 class UsuarioUpdate(BaseModel):
@@ -32,7 +38,6 @@ class UsuarioUpdate(BaseModel):
     segundo_apellido: Optional[str] = None
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = None
-    rol: Optional[str] = "Cliente"
     activo: Optional[bool] = None
 
 
@@ -46,23 +51,7 @@ class UsuarioResponse(UsuarioBase):
         from_attributes = True
 
 
-class UsuarioLogin(BaseModel):
-    correo: str
-    contraseña: str
-
-
-class CambioContraseña(BaseModel):
-    contraseña_actual: str
-    nueva_contraseña: str
-
-
-class loginResponse(BaseModel):
-    contraseña: str
-    correo: UsuarioResponse
-
-
 class CarritoBase(BaseModel):
-    id_usuario: UUID
     id_usuario: UUID
     fecha_crea: datetime
     fecha_actual: Optional[datetime] = None
@@ -160,7 +149,6 @@ class ProductoUpdate(BaseModel):
     precio_producto: Optional[float] = None
     stock: Optional[int] = None
     id_categoria: Optional[UUID] = None
-    id_usuarioActual: Optional[UUID] = None
 
 
 class ProductoResponse(ProductoBase):

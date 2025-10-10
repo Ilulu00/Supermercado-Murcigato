@@ -13,10 +13,7 @@ class CategoriaCRUD:
         self.db = db
 
     def crear_categoria(
-        self,
-        nombre_categoria: str,
-        descripcion: str = None,
-        id_usuarioCrea: UUID = None,
+        self, nombre_categoria: str, descripcion: str = None
     ) -> Categoria:
         """
         Módulo para crear una categoria con validaciones buenas.
@@ -24,7 +21,6 @@ class CategoriaCRUD:
         Args:
             nombre_categoria: Nombre de la categoría, la cual sera unica y con maximo de 50 caracteres.
             descripcion: Descripción opcional de la categoria
-            id_usuarioCrea: UUID del usuario que crea la categoría
 
         Returns:
             Categoría creada
@@ -42,24 +38,9 @@ class CategoriaCRUD:
         if self.obtener_categoria_por_nombre(nombre_categoria):
             raise ValueError("Ya existe una categoría con ese nombre")
 
-        if id_usuarioCrea is None:
-            from Entidades.Usuario import Usuario
-
-            admin = (
-                self.db.query(Usuario)
-                .filter(Usuario.rol == ("administrador").lower())
-                .first()
-            )
-            if not admin:
-                raise ValueError(
-                    "No se encontró un usuario administrador para crear la categoría"
-                )
-            id_usuarioCrea = admin.id_usuario
-
         categoria = Categoria(
             nombre_categoria=nombre_categoria.strip(),
             descripcion=descripcion.strip() if descripcion else None,
-            id_usuarioCrea=id_usuarioCrea,
         )
         self.db.add(categoria)
         self.db.commit()
@@ -113,15 +94,12 @@ class CategoriaCRUD:
         """
         return self.db.query(Categoria).offset(skip).limit(limit).all()
 
-    def actualizar_categoria(
-        self, id_categoria: UUID, id_usuarioActual: UUID = None, **kwargs
-    ) -> Optional[Categoria]:
+    def actualizar_categoria(self, id_categoria: UUID, **kwargs) -> Optional[Categoria]:
         """
         Módulo para actualizar una categoría buena (validaciones).
 
         Args:
             id_categoria: UUID de la categoría
-            id_usuarioActual: UUID del usuario que edita
             **kwargs: Campos a actualizar
 
         Returns:

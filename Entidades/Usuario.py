@@ -27,9 +27,7 @@ class Usuario(Base):
         direccion: El lugar de residencia del usuario.
         telefono: Como contactar al usuario.
         correo: direccion de correo del usuario.
-        rol: Que papel desempaña el usuario (Cliente/Empleado/Administrador)
         activo: para saber como se encuentra el usuario.
-        id_usuarioActual: El uuid del usuario (admin) que actualizo al usuario.
         fecha_registro: Fecha y hora de registro.
         fecha_actul: Fecha y hora de última actualización.
     """
@@ -44,22 +42,10 @@ class Usuario(Base):
     direccion = Column(String(100), nullable=False)
     telefono = Column(String(20), nullable=True)
     correo = Column(String(100), nullable=False)
-    contraseña = Column(String(100), nullable=False)
-    rol = Column(String(20), default="Cliente", nullable=False)
     activo = Column(Boolean, default=True, nullable=False)
     fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actual = Column(DateTime, onupdate=datetime.now)
 
-    proveedorCreado = relationship(
-        "Proveedor",
-        back_populates="usuarioCreador",
-        foreign_keys="[Proveedor.id_usuarioCrea]",
-    )
-    proveedorActualizado = relationship(
-        "Proveedor",
-        back_populates="usuarioActualizador",
-        foreign_keys="[Proveedor.id_usuarioActual]",
-    )
     usuarioCarrito = relationship("Carrito", back_populates="carritoUsuario")
 
     facturaU = relationship(
@@ -68,19 +54,9 @@ class Usuario(Base):
     facturas_creadas = relationship(
         "Factura", back_populates="usuarioCrea", foreign_keys="[Factura.id_usuarioCrea]"
     )
-    productosCreados = relationship(
-        "Producto",
-        back_populates="usuario_crea",
-        foreign_keys="[Producto.id_usuarioCrea]",
-    )
-    productosActualizados = relationship(
-        "Producto",
-        back_populates="usuario_Actualiza",
-        foreign_keys="[Producto.id_usuarioActualiza]",
-    )
 
     def __repr__(self):
-        return f"<Usuario {self.id_usuario}\nNombre completo: '{self.primer_nombre} {self.segundo_nombre or ''} {self.primer_apellido} {self.segundo_apellido or ''}'\nDireccion: {self.direccion}\nCorreo: {self.correo}\nTelefono: {self.telefono}\nRol: {self.rol}>"
+        return f"<Usuario {self.id_usuario}\nNombre completo: '{self.primer_nombre} {self.segundo_nombre or ''} {self.primer_apellido} {self.segundo_apellido or ''}'\nDireccion: {self.direccion}\nCorreo: {self.correo}\nTelefono: {self.telefono}>"
 
     def to_dict(self):
         return {
@@ -91,9 +67,7 @@ class Usuario(Base):
             "Segundo apellido": self.segundo_apellido,
             "Direccion": self.direccion,
             "Correo": self.correo,
-            "Contraseña": self.contraseña,
             "Telefono": self.telefono,
-            "Rol": self.rol,
             "activo": self.activo,
             "Fecha de registro": (
                 self.fecha_registro.isoformat() if self.fecha_registro else None
@@ -123,17 +97,8 @@ class UsuarioBase(BaseModel):
     correo: EmailStr = Field(
         ..., min_length=5, max_length=150, description="Correo electronico del usuario"
     )
-    contraseña: str = Field(
-        ...,
-        min_length=5,
-        max_length=100,
-        description="Contraseña del correo del usuario.",
-    )
     telefono: Optional[str] = Field(
         None, min_length=4, max_length=20, description="Número de contacto del usuario"
-    )
-    rol: str = Field(
-        ..., min_length=5, max_length=20, description="Rol que identifica al usuario."
     )
     activo: bool = Field(
         True, description="Señal del usuario, para verificar si esta activo o no"
@@ -156,14 +121,6 @@ class UsuarioBase(BaseModel):
         if not v.strip():
             raise ValueError("La direccion no puede quedar vacía.")
         return v.strip().title()
-
-    @field_validator("rol")
-    def val_rol(cls, v):
-        if not v.strip():
-            raise ValueError(
-                "El rol no puede estar vacio, todos los usuarios tiene un rol"
-            )
-        return f"Su rol es: {v.strip()}"
 
     @field_validator("correo")
     def val_correo(cls, v):
@@ -197,9 +154,7 @@ class CrearUsuario(UsuarioBase):
     segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
     direccion: str = Field(..., min_length=2, max_length=100)
     correo: EmailStr = ...
-    contraseña: str = ...
     telefono: Optional[str] = Field(None, max_length=20)
-    rol: str = Field(..., min_length=5, max_length=20)
     activo: Optional[bool] = Field(True)
 
     @field_validator("primer_nombre")

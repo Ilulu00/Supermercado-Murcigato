@@ -21,8 +21,6 @@ class Proveedor(Base):
        segundo_apellido: El segundo apellido del proveedor.
        telefono: Como contactar al proveedor.
        correo: direccion de correo del proveedor.
-       id_usuarioCrea: El id del usuario que creo al proveedor. (Auditoria).
-       id_usuarioActul: El id del usuario que actualizo al proveedor. (Auditoria).
        fecha_creacion: La fecha de creación del proveedor. (Auditoria).
        fecha_actualizacion: la fecha de actualizacion del proveedor. (Auditoria).
     """
@@ -36,21 +34,10 @@ class Proveedor(Base):
     segundo_apellido = Column(String(50), nullable=True)
     telefono = Column(String(20), nullable=True)
     correo = Column(String(100), nullable=False)
-    id_usuarioCrea = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
-    id_usuarioActual = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=True)
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
 
     productos = relationship("Producto", back_populates="proveedor")
-
-    usuarioCreador = relationship(
-        "Usuario", back_populates="proveedorCreado", foreign_keys=[id_usuarioCrea]
-    )
-    usuarioActualizador = relationship(
-        "Usuario",
-        back_populates="proveedorActualizado",
-        foreign_keys=[id_usuarioActual],
-    )
 
     def __repr__(self):
         return f"<Proveedor: {self.id_proveedor}\nNombre completo: '{self.primer_nombre} {self.segundo_nombre or ''} {self.primer_apellido} {self.segundo_apellido or ''}'\nCorreo: {self.correo}\nTelefono: {self.telefono}>"
@@ -91,12 +78,6 @@ class ProveedorBase(BaseModel):
         min_length=4,
         max_length=20,
         description="Número de contacto del proveedor",
-    )
-    id_usuarioCrea: str = Field(
-        ..., description="ID del usuario que creo el registro del proveedor."
-    )
-    id_usuarioActual: Optional[str] = Field(
-        None, description="ID del usuario que actualizo el registro del proveedor."
     )
     fecha_creacion: datetime = Field(
         ..., description="Fecha de creación del registro del proveedor."
@@ -150,7 +131,6 @@ class CrearProveedor(ProveedorBase):
     correo: EmailStr = ...
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)
-    id_usuarioCrea: str = Field(...)
     fecha_creacion: datetime = Field(...)
 
     @field_validator("primer_nombre")
@@ -198,7 +178,6 @@ class ActualizarProveedor(ProveedorBase):
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)
-    id_usuarioActual: str = Field(...)
     fecha_actualizacion: datetime = Field(...)
 
     @field_validator("primer_nombre")
