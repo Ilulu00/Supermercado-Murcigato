@@ -10,18 +10,10 @@ El Supermercado Murcigato es un sistema de gestión integral que permite la admi
 ## 🧩 Módulos principales
 
 ### 👤 **Usuario (Cliente)**
-- Autenticación segura con hash de contraseñas
 - Visualización de productos con filtros por categoría
 - Gestión de carrito de compras
 - Sistema de facturación
 - Perfil de usuario con información personal
-
-### 🛠 **Administrador**
-- Panel de administración completo
-- Gestión de usuarios (CRUD)
-- Gestión de categorías de productos
-- Gestión de productos e inventario
-- Control de stock y precios
 
 ## 🚀 Tecnologías Utilizadas
 
@@ -78,10 +70,9 @@ pip install -r Requerimientos.txt
 
 ### 3. **Configurar variables de entorno**
 Crear archivo `.env` en la raíz del proyecto:
-```env
-DATABASE_URL=postgresql://usuario:password@host:port/database
+```DATABASE_URL='postgresql://neondb_owner:npg_sK9nR5CfYAwB@ep-morning-lake-ad1f3v53-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
 ```
-<sub> Si depronto ya esta creado el archivo .env, omite este paso.</sub>
+<sub> Si el archivo .env ya esta creado, omite este paso.</sub>
 
 ### 4. **Ejecutar el sistema**
 ```bash
@@ -91,18 +82,15 @@ python main.py
 ## 🔑 Características Principales
 
 ### **Seguridad**
-- Autenticación con hash de contraseñas
-- Sistema de roles diferenciados
 - Validaciones robustas con Pydantic
 - Manejo seguro de sesiones
 
 ### **Funcionalidades**
-- **Gestión de Usuarios**: CRUD completo con validaciones
+- **Gestión de Usuarios**: CRUD completo
 - **Gestión de Productos**: Control de inventario y stock
 - **Sistema de Categorías**: Organización de productos
 - **Carrito de Compras**: Gestión de compras
 - **Sistema de Facturación**: Generación de facturas
-- **Panel de Administración**: Control total del sistema
 
 ### **Base de Datos**
 - **PostgreSQL** en la nube (Neon)
@@ -118,12 +106,10 @@ python main.py
 
 ## 📊 Estado del Proyecto
 
-- ✅ Sistema de autenticación implementado
 - ✅ CRUD completo para todas las entidades
 - ✅ Validaciones con Pydantic
 - ✅ Base de datos PostgreSQL configurada
 - ✅ Arquitectura modular implementada
-- ✅ Sistema de roles funcional
 - ✅ Modelo de APIs en Swagger UI
 - ✅ APIs hechas con fastAPI
 

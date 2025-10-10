@@ -30,8 +30,6 @@ class ProveedorCRUD:
         primer_nombre: str,
         primer_apellido: str,
         correo: str,
-        id_usuarioCrea: UUID,
-        id_usuario_logueado: UUID,
         fecha_creacion: datetime,
         segundo_nombre: str = None,
         segundo_apellido: str = None,
@@ -88,7 +86,6 @@ class ProveedorCRUD:
             segundo_apellido=segundo_apellido.strip() if segundo_apellido else None,
             correo=correo.lower().strip(),
             telefono=telefono.strip() if telefono else None,
-            id_usuarioCrea=id_usuario_logueado,
         )
         self.db.add(proveedor)
         self.db.commit()
@@ -134,9 +131,7 @@ class ProveedorCRUD:
         """
         return self.db.query(Proveedor).offset(skip).limit(limit).all()
 
-    def actualizar_proveedor(
-        self, id_usuarioActual, id_proveedor: UUID, **kwargs 
-    ) -> Optional[Proveedor]:
+    def actualizar_proveedor(self, id_proveedor: UUID, **kwargs) -> Optional[Proveedor]:
         """Modulo para actualizar algun proveedor, usando validaciones.
 
         Args:
@@ -148,20 +143,12 @@ class ProveedorCRUD:
         Raises:
             ValueError: si algun dato no es valido.
         """
-        usuario = (
-            self.db.query(Usuario)
-            .filter(Usuario.id_usuario == id_usuarioActual)
-            .first()
-        )
-        if not usuario or usuario.rol.lower() != "administrador":
-            raise ValueError("Solo un administrador puede actualizar proveedores.")
 
         proveedor = self.obtener_proveedor(id_proveedor)
         if not proveedor:
             return None
 
         proveedor.fecha_actualizacion = datetime.now()
-        proveedor.id_usuarioActual = id_usuarioActual
 
         if "correo" in kwargs:
             correo = kwargs.pop("correo")
