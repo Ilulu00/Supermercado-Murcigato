@@ -34,7 +34,9 @@ class Usuario(Base):
 
     __tablename__ = "Usuarios"
 
-    id_usuario = Column(UUID, primary_key=True, default=uuid4, nullable=False)
+    id_usuario = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
+    )
     primer_nombre = Column(String(50), nullable=False)
     segundo_nombre = Column(String(50), nullable=True)
     primer_apellido = Column(String(50), nullable=False)
@@ -50,9 +52,6 @@ class Usuario(Base):
 
     facturaU = relationship(
         "Factura", back_populates="usuarioF", foreign_keys="[Factura.id_usuario]"
-    )
-    facturas_creadas = relationship(
-        "Factura", back_populates="usuarioCrea", foreign_keys="[Factura.id_usuarioCrea]"
     )
 
     def __repr__(self):
@@ -225,3 +224,9 @@ class ActualizarUsuario(UsuarioBase):
             ):
                 raise ValueError("Formato de telefono no apto.")
         return v
+
+
+from Entidades.Proveedor import Proveedor
+from Entidades.Producto import Producto
+from Entidades.Carrito import Carrito
+from Entidades.Factura import Factura

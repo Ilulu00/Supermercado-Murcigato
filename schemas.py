@@ -9,33 +9,27 @@ from pydantic import BaseModel, EmailStr
 
 
 class UsuarioBase(BaseModel):
-    primerNombre: str
-    segundoNombre: Optional[str] = None
-    primerApellido: str
-    segundoApellido: Optional[str] = None
+    primer_nombre: str
+    segundo_nombre: Optional[str] = None
+    primer_apellido: str
+    segundo_apellido: Optional[str] = None
     direccion: str
     telefono: Optional[str] = None
     correo: str
     telefono: Optional[str] = None
     activo: bool
+    fecha_registro: datetime
 
 
 class UsuarioCreate(UsuarioBase):
-    id_usuario: UUID
-    primer_nombre: str
-    primer_apellido: str
-    correo: str
-    direccion: str
-    segundo_nombre: Optional[str] = None
-    segundo_apellido: Optional[str] = None
-    telefono: Optional[str] = None
+    pass
 
 
 class UsuarioUpdate(BaseModel):
-    primerNombre: Optional[str] = None
-    segundoNombre: Optional[str] = None
-    primerApellido: Optional[str] = None
-    segundoApellido: Optional[str] = None
+    primer_nombre: Optional[str] = None
+    segundo_nombre: Optional[str] = None
+    primer_apellido: Optional[str] = None
+    segundo_apellido: Optional[str] = None
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = None
     activo: Optional[bool] = None
@@ -44,8 +38,8 @@ class UsuarioUpdate(BaseModel):
 class UsuarioResponse(UsuarioBase):
     id_usuario: UUID
     activo: bool
-    fecha_creacion: datetime
-    fecha_edicion: Optional[datetime] = None
+    fecha_registro: datetime
+    fecha_actual: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -58,7 +52,6 @@ class CarritoBase(BaseModel):
 
 
 class RespuestaCarrito(CarritoBase):
-
     id_carrito: UUID
     fecha_crea: datetime
     fecha_actual: Optional[datetime] = None
@@ -89,7 +82,6 @@ class DetalleCarritoResponse(DetalleCarritoBase):
 
 
 class FacturaBase(BaseModel):
-    id_factura: UUID
     id_usuario: UUID
     id_carrito: UUID
     metodo_pago: str
@@ -104,7 +96,6 @@ class CrearFactura(FacturaBase):
 
 
 class RespuestaFactura(FacturaBase):
-
     id_factura: UUID
     fecha_actual: Optional[datetime] = None
 
@@ -113,8 +104,7 @@ class RespuestaFactura(FacturaBase):
 
 
 class CategoriaBase(BaseModel):
-    id_categoria: UUID
-    nombre: str
+    nombre_categoria: str
     descripcion: Optional[str] = None
 
 
@@ -123,7 +113,7 @@ class CategoriaCreate(CategoriaBase):
 
 
 class CategoriaUpdate(BaseModel):
-    nombre: Optional[str] = None
+    nombre_categoria: Optional[str] = None
     descripcion: Optional[str] = None
 
 
@@ -137,12 +127,12 @@ class CategoriaResponse(CategoriaBase):
 
 
 class ProductoBase(BaseModel):
-    id_producto: UUID
-    nombre: str
-    precio: float
+    nombre_producto: str
+    precio_producto: float
     stock: int
-    categoria_id: UUID
-    usuario_id: UUID
+    id_categoria: UUID
+    id_proveedor: UUID
+    fecha_creacion: datetime
 
 
 class ProductoCreate(ProductoBase):
@@ -150,23 +140,23 @@ class ProductoCreate(ProductoBase):
 
 
 class ProductoUpdate(BaseModel):
-    nombre: Optional[str] = None
-    precio: Optional[float] = None
+    nombre_producto: Optional[str] = None
+    precio_producto: Optional[float] = None
     stock: Optional[int] = None
-    categoria_id: Optional[UUID] = None
+    id_categoria: Optional[UUID] = None
+    fecha_actualizacion: Optional[datetime]
 
 
 class ProductoResponse(ProductoBase):
     id_producto: UUID
     fecha_creacion: datetime
-    fecha_edicion: Optional[datetime] = None
+    fecha_actualizacion: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
 
 class ProveedorBase(BaseModel):
-    id_proveedor: UUID
     primer_nombre: str
     segundo_nombre: Optional[str] = None
     primer_apellido: str
@@ -176,14 +166,14 @@ class ProveedorBase(BaseModel):
 
 
 class ProveedorCreate(ProveedorBase):
-    pass
+    fecha_creacion: datetime
 
 
 class ProveedorUpdate(BaseModel):
-    primerNombre: Optional[str] = None
-    segundoNombre: Optional[str] = None
-    primerApellido: Optional[str] = None
-    segundoApellido: Optional[str] = None
+    primer_nombre: Optional[str] = None
+    segundo_nombre: Optional[str] = None
+    primer_apellido: Optional[str] = None
+    segundo_apellido: Optional[str] = None
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = None
 
@@ -191,7 +181,7 @@ class ProveedorUpdate(BaseModel):
 class ProveedorResponse(ProveedorBase):
     id_proveedor: UUID
     fecha_creacion: datetime
-    fecha_edicion: Optional[datetime] = None
+    fecha_actualizacion: Optional[datetime] = None
 
     class Config:
         from_attributes = True

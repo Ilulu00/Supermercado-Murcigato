@@ -91,7 +91,7 @@ class CarritoCRUD:
             .filter(Detalle_carrito.id_carrito == id_carrito)
             .all()
         )
-        
+
         total = sum(det.subtotal for det in detalle)
 
         return {
@@ -122,7 +122,7 @@ class CarritoCRUD:
         )
 
         if not detalle:
-            raise ValueError("El producto a actualiziar no existe en tu carrito.")
+            raise ValueError("El producto a actualizar no existe en tu carrito.")
 
         detalle.cantidad = cantidad_nueva
         detalle.subtotal = detalle.producto.precio_producto * cantidad_nueva
@@ -130,3 +130,33 @@ class CarritoCRUD:
         self.db.commit()
         self.db.refresh(detalle)
         return detalle
+
+
+def eliminar_producto(
+    self, id_carrito: UUID, id_producto: UUID
+) -> Optional[Detalle_carrito]:
+    """
+    Módulo para eliminar un producto del carrito
+
+    Raises:
+            Si el carrito no existe.
+            Si el producto no existe.
+
+    Returns:
+        producto_eliminado: Siendo este el producto eliminado.
+    """
+    detalle = (
+        self.db.query(Detalle_carrito)
+        .filter(
+            Detalle_carrito.id_carrito == id_carrito,
+            Detalle_carrito.id_producto == id_producto,
+        )
+        .first()
+    )
+
+    if not detalle:
+        raise ValueError("El producto no existe en el carrito.")
+
+    self.db.delete(detalle)
+    self.db.commit()
+    return detalle

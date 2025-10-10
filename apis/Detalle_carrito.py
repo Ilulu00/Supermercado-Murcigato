@@ -6,7 +6,6 @@ Endpoints de Detalle_carrito. API de Detalle_carrito
 from typing import List
 from uuid import UUID
 
-from crud.CarritoCRUD import CarritoCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas import DetalleCarritoCreate, DetalleCarritoResponse

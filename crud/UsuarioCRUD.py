@@ -5,8 +5,6 @@ Operaciones CRUD para el usuario
 import re
 from typing import List, Optional
 from uuid import UUID
-
-import bcrypt
 from sqlalchemy.orm import Session
 
 from Entidades.Usuario import Usuario
@@ -31,7 +29,6 @@ class UsuarioCRUD:
         primer_nombre: str,
         primer_apellido: str,
         correo: str,
-        contraseña: str,
         direccion: str,
         segundo_nombre: str = None,
         segundo_apellido: str = None,
