@@ -4,9 +4,7 @@ API de Factura. Endpoints para operaciones en el api.
 """
 
 from typing import List
-from uuid import UUID
 
-from crud.FacturaCRUD import FacturaCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas import RespuestaFactura, CrearFactura

@@ -71,14 +71,6 @@ class ProveedorCRUD:
         if telefono and not self.validar_telefono(telefono):
             raise ValueError("Formato de teléfono inválido")
 
-        usuario = (
-            self.db.query(Usuario)
-            .filter(Usuario.id_usuario == id_usuario_logueado)
-            .first()
-        )
-        if not usuario or usuario.rol.lower() != "administrador":
-            raise ValueError("Solo un administrador puede crear proveedores.")
-
         proveedor = Proveedor(
             primer_nombre=primer_nombre.lower().strip(),
             segundo_nombre=segundo_nombre.strip() if segundo_nombre else None,
@@ -86,6 +78,7 @@ class ProveedorCRUD:
             segundo_apellido=segundo_apellido.strip() if segundo_apellido else None,
             correo=correo.lower().strip(),
             telefono=telefono.strip() if telefono else None,
+            fecha_creacion=datetime.now(),
         )
         self.db.add(proveedor)
         self.db.commit()
