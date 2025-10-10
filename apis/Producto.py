@@ -108,7 +108,7 @@ async def crear_producto(producto_data: ProductoCreate, db: Session = Depends(ge
             precio_producto=producto_data.precio_producto,
             stock=producto_data.stock,
             id_categoria=producto_data.id_categoria,
-            id_usuarioCrea=producto_data.id_usuarioCrea,
+            id_proveedor=producto_data.id_proveedor
         )
         return producto
     except ValueError as e:

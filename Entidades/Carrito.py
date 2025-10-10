@@ -24,8 +24,12 @@ class Carrito(Base):
 
     __tablename__ = "Carrito"
 
-    id_carrito = Column(UUID, primary_key=True, default=uuid4, nullable=False)
-    id_usuario = Column(UUID, ForeignKey("Usuarios.id_usuario"), nullable=False)
+    id_carrito = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
+    )
+    id_usuario = Column(
+        UUID(as_uuid=True), ForeignKey("Usuarios.id_usuario"), nullable=False
+    )
     fecha_crea = Column(DateTime, default=datetime.now)
     fecha_actual = Column(DateTime, onupdate=datetime.now)
 

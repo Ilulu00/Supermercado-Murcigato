@@ -16,7 +16,6 @@ from apis import (
 from database.config import create_tables
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from decouple import config
 
 """ Crear la aplicación FastAPI """
 app = FastAPI(

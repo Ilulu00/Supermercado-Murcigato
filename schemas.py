@@ -18,17 +18,11 @@ class UsuarioBase(BaseModel):
     correo: str
     telefono: Optional[str] = None
     activo: bool
+    fecha_registro: datetime
 
 
 class UsuarioCreate(UsuarioBase):
-    id_usuario: UUID
-    primer_nombre: str
-    primer_apellido: str
-    correo: str
-    direccion: str
-    segundo_nombre: Optional[str] = None
-    segundo_apellido: Optional[str] = None
-    telefono: Optional[str] = None
+    pass
 
 
 class UsuarioUpdate(BaseModel):
@@ -44,8 +38,8 @@ class UsuarioUpdate(BaseModel):
 class UsuarioResponse(UsuarioBase):
     id_usuario: UUID
     activo: bool
-    fecha_creacion: datetime
-    fecha_edicion: Optional[datetime] = None
+    fecha_registro: datetime
+    fecha_actual: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -137,7 +131,8 @@ class ProductoBase(BaseModel):
     precio_producto: float
     stock: int
     id_categoria: UUID
-    id_usuarioCrea: UUID
+    id_proveedor: UUID
+    fecha_creacion: datetime
 
 
 class ProductoCreate(ProductoBase):
@@ -149,12 +144,13 @@ class ProductoUpdate(BaseModel):
     precio_producto: Optional[float] = None
     stock: Optional[int] = None
     id_categoria: Optional[UUID] = None
+    fecha_actualizacion: Optional[datetime]
 
 
 class ProductoResponse(ProductoBase):
     id_producto: UUID
     fecha_creacion: datetime
-    fecha_edicion: Optional[datetime] = None
+    fecha_actualizacion: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -170,7 +166,7 @@ class ProveedorBase(BaseModel):
 
 
 class ProveedorCreate(ProveedorBase):
-    pass
+    fecha_creacion: datetime
 
 
 class ProveedorUpdate(BaseModel):
@@ -185,7 +181,7 @@ class ProveedorUpdate(BaseModel):
 class ProveedorResponse(ProveedorBase):
     id_proveedor: UUID
     fecha_creacion: datetime
-    fecha_edicion: Optional[datetime] = None
+    fecha_actualizacion: Optional[datetime] = None
 
     class Config:
         from_attributes = True

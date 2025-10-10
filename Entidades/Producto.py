@@ -30,12 +30,18 @@ class Producto(Base):
 
     __tablename__ = "Productos"
 
-    id_producto = Column(UUID, primary_key=True, default=uuid4, nullable=False)
+    id_producto = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
+    )
     nombre_producto = Column(String(200), nullable=False, index=True)
     precio_producto = Column(Float, nullable=False)
     stock = Column(Integer, default=0, nullable=False)
-    id_categoria = Column(UUID, ForeignKey("Categorias.id_categoria"), nullable=False)
-    id_proveedor = Column(UUID, ForeignKey("Proveedor.id_proveedor"), nullable=False)
+    id_categoria = Column(
+        UUID(as_uuid=True), ForeignKey("Categorias.id_categoria"), nullable=False
+    )
+    id_proveedor = Column(
+        UUID(as_uuid=True), ForeignKey("Proveedor.id_proveedor"), nullable=False
+    )
 
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.now)
     fecha_actualizacion = Column(DateTime, onupdate=datetime.now, nullable=True)
@@ -48,15 +54,13 @@ class Producto(Base):
     )
     detalles = relationship("Detalle_carrito", back_populates="producto")
 
+    def __repr__(self):
+        return (
+            f"<ID Producto: {self.id_producto}\n"
+            f"Nombre del producto: {self.nombre_producto}\n"
+            f"Precio del producto: {self.precio_producto}\n"
+            f"Cantidad actual: {self.stock}"
+        )
 
-def __repr__(self):
-    return (
-        f"<ID Producto: {self.id_producto}\n"
-        f"Nombre del producto: {self.nombre_producto}\n"
-        f"Precio del producto: {self.precio_producto}\n"
-        f"Cantidad actual: {self.stock}"
-    )
 
-
-from Entidades.Categoria_prod import Categoria
 from Entidades.Detalle_carrito import Detalle_carrito

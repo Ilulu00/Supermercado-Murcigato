@@ -28,9 +28,15 @@ class Detalle_carrito(Base):
 
     __tablename__ = "Detalle_carrito"
 
-    id_detalle = Column(UUID, primary_key=True, default=uuid4, nullable=False)
-    id_carrito = Column(UUID, ForeignKey("Carrito.id_carrito"), nullable=False)
-    id_producto = Column(UUID, ForeignKey("Productos.id_producto"), nullable=False)
+    id_detalle = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
+    )
+    id_carrito = Column(
+        UUID(as_uuid=True), ForeignKey("Carrito.id_carrito"), nullable=False
+    )
+    id_producto = Column(
+        UUID(as_uuid=True), ForeignKey("Productos.id_producto"), nullable=False
+    )
     cantidad = Column(Integer, nullable=False)
 
     carrito = relationship(
@@ -72,4 +78,4 @@ class Detalle_carrito(Base):
         }
 
 
-
+from Entidades.Producto import Producto

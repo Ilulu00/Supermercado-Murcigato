@@ -10,6 +10,7 @@ from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas import ProveedorCreate, ProveedorResponse, ProveedorUpdate
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 router = APIRouter(prefix="/proveedor", tags=["proveedor"])
 
@@ -84,6 +85,7 @@ async def crear_proveedor(
             segundo_nombre=proveedor_data.segundo_nombre,
             segundo_apellido=proveedor_data.segundo_apellido,
             telefono=proveedor_data.telefono,
+            fecha_creacion= datetime.now()
         )
         return proveedor
     except ValueError as e:

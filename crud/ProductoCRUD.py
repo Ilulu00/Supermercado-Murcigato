@@ -4,7 +4,7 @@ Operaciones CRUD para Producto
 
 from typing import List, Optional
 from uuid import UUID
-
+from Entidades.Proveedor import Proveedor
 from Entidades.Producto import Producto
 from sqlalchemy.orm import Session
 
@@ -20,7 +20,7 @@ class ProductoCRUD:
         precio_producto: float,
         stock: int,
         id_categoria: UUID,
-        id_usuario: UUID,
+        id_proveedor: UUID,
     ) -> Producto:
         """
         Crear un nuevo producto con validaciones
@@ -29,8 +29,8 @@ class ProductoCRUD:
             nombre_producto: Nombre del producto, el cual no puede ser de mas de 100 caracteres.
             precio_producto: Precio del producto, no puede ser negativo.
             stock: Cantidad en stock, no puede ser negativo al igual que el precio.
+            id_proveedor: El UUID del proveedor que proveio el producto
             id_categoria: UUID de la categoría
-            id_usuario: UUID del usuario propietario
 
         Returns:
             Producto creado
@@ -60,20 +60,20 @@ class ProductoCRUD:
         if not categoria:
             raise ValueError("La categoría especificada no existe.")
 
-        from Entidades.Usuario import Usuario
-
-        usuario = (
-            self.db.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
+        proveedor = (
+            self.db.query(Proveedor)
+            .filter(Proveedor.id_proveedor == id_proveedor)
+            .first()
         )
-        if not usuario:
-            raise ValueError("El usuario especificado no existe")
+        if not proveedor:
+            raise ValueError("El proveedor especificado no existe.")
 
         producto = Producto(
             nombre_producto=nombre_producto.strip(),
             precio_producto=precio_producto,
             stock=stock,
-            id_categoria=id_categoria,
-            id_usuario=id_usuario,
+            categoria=categoria,
+            proveedor=proveedor,
         )
         self.db.add(producto)
         self.db.commit()
@@ -190,22 +190,11 @@ class ProductoCRUD:
 
             categoria = (
                 self.db.query(Categoria)
-                .filter(Categoria.id_categoria == kwargs["categoria_id"])
+                .filter(Categoria.id_categoria == kwargs["id_categoria"])
                 .first()
             )
             if not categoria:
                 raise ValueError("La categoría especificada no existe.")
-
-        if "id_usuario" in kwargs:
-            from Entidades.Usuario import Usuario
-
-            usuario = (
-                self.db.query(Usuario)
-                .filter(Usuario.id_usuario == kwargs["id_usuario"])
-                .first()
-            )
-            if not usuario:
-                raise ValueError("El usuario especificado no existe")
 
         for key, value in kwargs.items():
             if hasattr(producto, key):

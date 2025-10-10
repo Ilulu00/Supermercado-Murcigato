@@ -128,22 +128,6 @@ class CategoriaCRUD:
         if "descripcion" in kwargs and kwargs["descripcion"]:
             kwargs["descripcion"] = kwargs["descripcion"].strip()
 
-        if id_usuarioActual is None:
-            from Entidades.Usuario import Usuario
-
-            admin = (
-                self.db.query(Usuario)
-                .filter(Usuario.rol == ("administrador").lower())
-                .first()
-            )
-            if not admin:
-                raise ValueError(
-                    "No se encontró un usuario administrador para editar la categoría"
-                )
-            id_usuarioActual = admin.id_usuario
-
-        categoria.id_usuarioActual = id_usuarioActual
-
         for key, value in kwargs.items():
             if hasattr(categoria, key):
                 setattr(categoria, key, value)

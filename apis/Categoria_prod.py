@@ -41,7 +41,7 @@ async def obtener_categoria(id_categoria: UUID, db: Session = Depends(get_db)):
                 status_code=status.HTTP_404_NOT_FOUND, detail="Categoría no encontrada"
             )
         return categoria
-    except HTTPException:
+    except HTTPException: 
         raise
     except Exception as e:
         raise HTTPException(
