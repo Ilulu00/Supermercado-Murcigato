@@ -270,3 +270,9 @@ class ActualizarUsuario(UsuarioBase):
             ):
                 raise ValueError("Formato de telefono no apto.")
         return v
+
+
+from Entidades.Proveedor import Proveedor
+from Entidades.Producto import Producto
+from Entidades.Carrito import Carrito
+from Entidades.Factura import Factura

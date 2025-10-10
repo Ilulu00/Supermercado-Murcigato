@@ -69,3 +69,7 @@ def __repr__(self):
         f"Precio del producto: {self.precio_producto}\n"
         f"Cantidad actual: {self.stock}"
     )
+
+
+from Entidades.Categoria_prod import Categoria
+from Entidades.Detalle_carrito import Detalle_carrito

@@ -8,7 +8,7 @@ from uuid import UUID
 from crud.Categoria_productoCRUD import CategoriaCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import CategoriaCreate, CategoriaResponse, CategoriaUpdate, RespuestaAPI
+from schemas import CategoriaCreate, CategoriaResponse, CategoriaUpdate
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/categorias", tags=["categorias"])
@@ -30,12 +30,12 @@ async def obtener_categorias(
         )
 
 
-@router.get("/{categoria_id}", response_model=CategoriaResponse)
-async def obtener_categoria(categoria_id: UUID, db: Session = Depends(get_db)):
+@router.get("/{id_categoria}", response_model=CategoriaResponse)
+async def obtener_categoria(id_categoria: UUID, db: Session = Depends(get_db)):
     """Obtener una categoría por ID."""
     try:
         categoria_crud = CategoriaCRUD(db)
-        categoria = categoria_crud.obtener_categoria(categoria_id)
+        categoria = categoria_crud.obtener_categoria(id_categoria)
         if not categoria:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Categoría no encontrada"
@@ -50,12 +50,14 @@ async def obtener_categoria(categoria_id: UUID, db: Session = Depends(get_db)):
         )
 
 
-@router.get("/nombre/{nombre}", response_model=CategoriaResponse)
-async def obtener_categoria_por_nombre(nombre: str, db: Session = Depends(get_db)):
+@router.get("/nombre_categoria/{nombre_categoria}", response_model=CategoriaResponse)
+async def obtener_categoria_por_nombre(
+    nombre_categoria: str, db: Session = Depends(get_db)
+):
     """Obtener una categoría por nombre."""
     try:
         categoria_crud = CategoriaCRUD(db)
-        categoria = categoria_crud.obtener_categoria_por_nombre(nombre)
+        categoria = categoria_crud.obtener_categoria_por_nombre(nombre_categoria)
         if not categoria:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Categoría no encontrada"
@@ -78,7 +80,7 @@ async def crear_categoria(
     try:
         categoria_crud = CategoriaCRUD(db)
         categoria = categoria_crud.crear_categoria(
-            nombre=categoria_data.nombre,
+            nombre_categoria=categoria_data.nombre_categoria,
             descripcion=categoria_data.descripcion,
         )
         return categoria
@@ -91,16 +93,16 @@ async def crear_categoria(
         )
 
 
-@router.put("/{categoria_id}", response_model=CategoriaResponse)
+@router.put("/{id_categoria}", response_model=CategoriaResponse)
 async def actualizar_categoria(
-    categoria_id: UUID, categoria_data: CategoriaUpdate, db: Session = Depends(get_db)
+    id_categoria: UUID, categoria_data: CategoriaUpdate, db: Session = Depends(get_db)
 ):
     """Actualizar una categoría existente."""
     try:
         categoria_crud = CategoriaCRUD(db)
 
         """ Verificar que la categoría existe """
-        categoria_existente = categoria_crud.obtener_categoria(categoria_id)
+        categoria_existente = categoria_crud.obtener_categoria(id_categoria)
         if not categoria_existente:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Categoría no encontrada"
@@ -115,7 +117,7 @@ async def actualizar_categoria(
             return categoria_existente
 
         categoria_actualizada = categoria_crud.actualizar_categoria(
-            categoria_id, **campos_actualizacion
+            id_categoria, **campos_actualizacion
         )
         return categoria_actualizada
     except HTTPException:

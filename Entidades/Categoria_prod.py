@@ -49,3 +49,7 @@ class Categoria(Base):
 
     def __repr__(self):
         return f"<Categoria(id_categoria={self.id_categoria}, nombre='{self.nombre_categoria}')>"
+
+
+from Entidades.Usuario import Usuario
+from Entidades.Producto import Producto

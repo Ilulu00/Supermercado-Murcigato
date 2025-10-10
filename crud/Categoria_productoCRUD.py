@@ -29,6 +29,7 @@ class CategoriaCRUD:
         Returns:
             Categoría creada
 
+
         Raises:
             ValueError: Si los datos no son válidos
         """

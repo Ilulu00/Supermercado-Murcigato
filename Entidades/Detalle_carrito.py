@@ -70,3 +70,6 @@ class Detalle_carrito(Base):
             ],
             "Precio total": self.Precio_total,
         }
+
+
+

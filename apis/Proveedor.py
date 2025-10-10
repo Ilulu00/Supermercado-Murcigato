@@ -8,7 +8,7 @@ from uuid import UUID
 from crud.ProveedorCRUD import ProveedorCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import ProveedorCreate, ProveedorResponse, ProveedorUpdate, RespuestaAPI
+from schemas import ProveedorCreate, ProveedorResponse, ProveedorUpdate
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/proveedor", tags=["proveedor"])
@@ -50,9 +50,7 @@ async def obtener_proveedor(proveedor_id: UUID, db: Session = Depends(get_db)):
         )
 
 
-@router.get(
-    "/correo/{correo}", response_model=ProveedorResponse
-)  # Preguntar si puede ser correo = a usuario o debe ser correo_proveedor
+@router.get("/correo/{correo}", response_model=ProveedorResponse)
 async def obtener_proveedor_por_correo(correo: str, db: Session = Depends(get_db)):
     """Obtener un proveedor por correo."""
     try:
@@ -97,16 +95,16 @@ async def crear_proveedor(
         )
 
 
-@router.put("/{proveedor_id}", response_model=ProveedorResponse)
+@router.put("/{id_proveedor}", response_model=ProveedorResponse)
 async def actualizar_proveedor(
-    proveedor_id: UUID, proveedor_data: ProveedorUpdate, db: Session = Depends(get_db)
+    id_proveedor: UUID, proveedor_data: ProveedorUpdate, db: Session = Depends(get_db)
 ):
     """Actualizar un proveedor existente."""
     try:
         proveedor_crud = ProveedorCRUD(db)
 
         """ Verificar que el proveedor existe """
-        proveedor_existente = proveedor_crud.obtener_proveedor(proveedor_id)
+        proveedor_existente = proveedor_crud.obtener_proveedor(id_proveedor)
         if not proveedor_existente:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Proveedor no encontrado"
@@ -121,7 +119,7 @@ async def actualizar_proveedor(
             return proveedor_existente
 
         proveedor_actualizado = proveedor_crud.actualizar_proveedor(
-            proveedor_id, **campos_actualizacion
+            id_proveedor, **campos_actualizacion
         )
         return proveedor_actualizado
     except HTTPException:

@@ -8,7 +8,7 @@ from uuid import UUID
 from crud.ProductoCRUD import ProductoCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import ProductoCreate, ProductoResponse, ProductoUpdate, RespuestaAPI
+from schemas import ProductoCreate, ProductoResponse, ProductoUpdate
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/productos", tags=["productos"])
@@ -30,12 +30,12 @@ async def obtener_productos(
         )
 
 
-@router.get("/{producto_id}", response_model=ProductoResponse)
-async def obtener_producto(producto_id: UUID, db: Session = Depends(get_db)):
+@router.get("/{id_producto}", response_model=ProductoResponse)
+async def obtener_producto(id_producto: UUID, db: Session = Depends(get_db)):
     """Obtener un producto por ID."""
     try:
         producto_crud = ProductoCRUD(db)
-        producto = producto_crud.obtener_producto(producto_id)
+        producto = producto_crud.obtener_producto(id_producto)
         if not producto:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado"
@@ -50,14 +50,14 @@ async def obtener_producto(producto_id: UUID, db: Session = Depends(get_db)):
         )
 
 
-@router.get("/categoria/{categoria_id}", response_model=List[ProductoResponse])
+@router.get("/categoria/{id_categoria}", response_model=List[ProductoResponse])
 async def obtener_productos_por_categoria(
-    categoria_id: UUID, db: Session = Depends(get_db)
+    id_categoria: UUID, db: Session = Depends(get_db)
 ):
     """Obtener productos por categoría."""
     try:
         producto_crud = ProductoCRUD(db)
-        productos = producto_crud.obtener_productos_por_categoria(categoria_id)
+        productos = producto_crud.obtener_productos_por_categoria(id_categoria)
         return productos
     except Exception as e:
         raise HTTPException(
@@ -66,14 +66,14 @@ async def obtener_productos_por_categoria(
         )
 
 
-@router.get("/usuario/{usuario_id}", response_model=List[ProductoResponse])
+@router.get("/usuario/{id_usuario}", response_model=List[ProductoResponse])
 async def obtener_productos_por_usuario(
-    usuario_id: UUID, db: Session = Depends(get_db)
+    id_usuario: UUID, db: Session = Depends(get_db)
 ):
     """Obtener productos por usuario."""
     try:
         producto_crud = ProductoCRUD(db)
-        productos = producto_crud.obtener_productos_por_usuario(usuario_id)
+        productos = producto_crud.obtener_productos_por_usuario(id_usuario)
         return productos
     except Exception as e:
         raise HTTPException(
@@ -82,12 +82,14 @@ async def obtener_productos_por_usuario(
         )
 
 
-@router.get("/buscar/{nombre}", response_model=List[ProductoResponse])
-async def buscar_productos_por_nombre(nombre: str, db: Session = Depends(get_db)):
+@router.get("/buscar/{nombre_producto}", response_model=List[ProductoResponse])
+async def buscar_productos_por_nombre(
+    nombre_producto: str, db: Session = Depends(get_db)
+):
     """Buscar productos por nombre (búsqueda parcial)."""
     try:
         producto_crud = ProductoCRUD(db)
-        productos = producto_crud.buscar_productos_por_nombre(nombre)
+        productos = producto_crud.buscar_productos_por_nombre(nombre_producto)
         return productos
     except Exception as e:
         raise HTTPException(
@@ -102,11 +104,11 @@ async def crear_producto(producto_data: ProductoCreate, db: Session = Depends(ge
     try:
         producto_crud = ProductoCRUD(db)
         producto = producto_crud.crear_producto(
-            nombre=producto_data.nombre,
-            precio=producto_data.precio,
+            nombre_producto=producto_data.nombre_producto,
+            precio_producto=producto_data.precio_producto,
             stock=producto_data.stock,
-            categoria_id=producto_data.categoria_id,
-            usuario_id=producto_data.usuario_id,
+            id_categoria=producto_data.id_categoria,
+            id_usuarioCrea=producto_data.id_usuarioCrea,
         )
         return producto
     except ValueError as e:
@@ -118,16 +120,16 @@ async def crear_producto(producto_data: ProductoCreate, db: Session = Depends(ge
         )
 
 
-@router.put("/{producto_id}", response_model=ProductoResponse)
+@router.put("/{id_producto}", response_model=ProductoResponse)
 async def actualizar_producto(
-    producto_id: UUID, producto_data: ProductoUpdate, db: Session = Depends(get_db)
+    id_producto: UUID, producto_data: ProductoUpdate, db: Session = Depends(get_db)
 ):
     """Actualizar un producto existente."""
     try:
         producto_crud = ProductoCRUD(db)
 
         """ Verificar que el producto existe """
-        producto_existente = producto_crud.obtener_producto(producto_id)
+        producto_existente = producto_crud.obtener_producto(id_producto)
         if not producto_existente:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado"
@@ -142,7 +144,7 @@ async def actualizar_producto(
             return producto_existente
 
         producto_actualizado = producto_crud.actualizar_producto(
-            producto_id, **campos_actualizacion
+            id_producto, **campos_actualizacion
         )
         return producto_actualizado
     except HTTPException:
@@ -156,16 +158,16 @@ async def actualizar_producto(
         )
 
 
-@router.patch("/{producto_id}/stock", response_model=ProductoResponse)
+@router.patch("/{id_producto}/stock", response_model=ProductoResponse)
 async def actualizar_stock(
-    producto_id: UUID, nuevo_stock: int, db: Session = Depends(get_db)
+    id_producto: UUID, nuevo_stock: int, db: Session = Depends(get_db)
 ):
     """Actualizar el stock de un producto."""
     try:
         producto_crud = ProductoCRUD(db)
 
         """ Verificar que el producto existe """
-        producto_existente = producto_crud.obtener_producto(producto_id)
+        producto_existente = producto_crud.obtener_producto(id_producto)
         if not producto_existente:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado"
@@ -177,7 +179,7 @@ async def actualizar_stock(
                 detail="El stock no puede ser negativo",
             )
 
-        producto_actualizado = producto_crud.actualizar_stock(producto_id, nuevo_stock)
+        producto_actualizado = producto_crud.actualizar_stock(id_producto, nuevo_stock)
         return producto_actualizado
     except HTTPException:
         raise

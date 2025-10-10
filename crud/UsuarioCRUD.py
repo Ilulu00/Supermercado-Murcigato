@@ -15,7 +15,7 @@ from Entidades.Usuario import Usuario
 class UsuarioCRUD:
     def __init__(self, db: Session):
         self.db = db
-    
+
     @staticmethod
     def hash_contraseña(contraseña: str) -> str:
         salt = bcrypt.gensalt()
@@ -47,6 +47,7 @@ class UsuarioCRUD:
         segundo_apellido: str = None,
         telefono: str = None,
         rol: str = "Cliente",
+        rol_forzado: str = None,
     ) -> Usuario:
         """
         Crear un nuevo usuario con validaciones
@@ -94,6 +95,7 @@ class UsuarioCRUD:
             raise ValueError("La direccion es obligatoria")
 
         contraseña_hash = self.hash_contraseña(contraseña)
+        rol_final = rol_forzado if rol_forzado else rol
 
         usuario = Usuario(
             primer_nombre=primer_nombre.lower().strip(),
@@ -103,7 +105,7 @@ class UsuarioCRUD:
             correo=correo.lower().strip(),
             telefono=telefono.strip() if telefono else None,
             direccion=direccion,
-            rol=rol,
+            rol=rol_final.lower(),
             contraseña=contraseña_hash,
         )
 
