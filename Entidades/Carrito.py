@@ -6,7 +6,7 @@ Aqui sera donde se creara la entidad carritocon SQLalchemy, asi como algunas val
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -30,8 +30,9 @@ class Carrito(Base):
     id_usuario = Column(
         UUID(as_uuid=True), ForeignKey("Usuarios.id_usuario"), nullable=False
     )
-    fecha_crea = Column(DateTime, default=datetime.now)
+    fecha_crea = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actual = Column(DateTime, onupdate=datetime.now)
+    activo = Column(Boolean, default=True, nullable=False)
 
     carritoUsuario = relationship(
         "Usuario", back_populates="usuarioCarrito", foreign_keys=[id_usuario]
@@ -42,35 +43,49 @@ class Carrito(Base):
         foreign_keys="Detalle_carrito.id_carrito",
         cascade="all, delete-orphan",
     )
-    facturaC = relationship("Factura", back_populates="carritoF", foreign_keys=[])
+    facturaC = relationship("Factura", back_populates="carritoF")
 
     @property
     def total(self):
-        return sum(self.productos.subtotal)
+        if not self.detalles:
+            return 0.0
+        return sum(detalle.subtotal for detalle in self.detalles)
 
     def __repr__(self):
         return (
-            f"<Carrito de compras {self.id_carrito}.\n"
-            f"ID del cliente: {self.carritoUsuario.id_usuario}\n"
-            f"Cantidad de productos: {len(self.productos)}"
-            f"Total a pagar: {self.precio_total}>"
+            f"<Carrito(id_carrito={self.id_carrito}, "
+            f"id_usuario={self.id_usuario}, "
+            f"total={self.total}, activo={self.activo})>"
         )
 
     def to_dict(self):
         return {
             "ID carrito": str(self.id_carrito),
+            "Activo": self.activo,
             "Cliente": {
-                "ID cliente": str(self.carritoUsuario.id_usuario),
-                "Nombre Completo": f"{self.carritoUsuario.primer_nombre} {self.carritoUsuario.segundo_nombre or ''} "
-                f"{self.carritoUsuario.primer_apellido} {self.carritoUsuario.segundo_apellido or ''}",
+                "ID usuario": str(self.carritoUsuario.id_usuario),
+                "Nombre completo": f"{self.carritoUsuario.primer_nombre} {self.carritoUsuario.segundo_nombre or ''} "
+                f"{self.carritoUsuario.primer_apellido} {self.carritoUsuario.segundo_apellido or ''}".strip(),
+                "Correo": self.carritoUsuario.correo,
             },
+            "Fecha de creación": (
+                self.fecha_crea.isoformat() if self.fecha_crea else None
+            ),
+            "Última actualización": (
+                self.fecha_actual.isoformat() if self.fecha_actual else None
+            ),
             "Productos": [
                 {
-                    "ID producto": str(p.id_producto),
-                    "Nombre": p.nombre_producto,
-                    "Precio": p.precio_producto,
+                    "ID detalle": str(d.id_detalle),
+                    "ID producto": str(d.producto.id_producto),
+                    "Nombre": d.producto.nombre_producto,
+                    "Precio unitario": d.producto.precio_producto,
+                    "Cantidad": d.cantidad,
+                    "Subtotal": d.subtotal,
                 }
-                for p in self.carritoProducto
+                for d in self.detalles
             ],
-            "Precio total": self.total,
+            "Total a pagar": (
+                sum(d.subtotal for d in self.detalles) if self.detalles else 0.0
+            ),
         }

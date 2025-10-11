@@ -16,19 +16,20 @@ router = APIRouter(prefix="/carritos", tags=["Carrito"])
 
 
 @router.post("/", response_model=RespuestaCarrito)
-def crear_carrito_de_compras(
-    carrito: CrearCarrito, id_usuario: UUID, db: Session = Depends(get_db)
-):
+def crear_carrito_de_compras(carrito: CrearCarrito, db: Session = Depends(get_db)):
     """
     Módulo para crear un carrito, en este caso vacio. El carrito se llena es en detalle_carrito
 
     """
     carrito_crud = CarritoCRUD(db)
-    carrito = carrito_crud.crear_carrito(db, id_usuario=id_usuario)
-    db.add(carrito)
-    db.commit()
-    db.refresh(carrito)
-    return carrito
+    try:
+        nuevo_carrito = carrito_crud.crear_carrito(id_usuario=carrito.id_usuario, activo=True)
+        return nuevo_carrito
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear carrito: {str(e)}")
 
 
 @router.get("/", response_model=List[DetalleCarritoResponse])
