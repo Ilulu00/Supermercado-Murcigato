@@ -10,7 +10,9 @@ from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas import DetalleCarritoCreate, DetalleCarritoResponse
 from sqlalchemy.orm import Session
-import Entidades
+from Entidades.Detalle_carrito import Detalle_carrito
+from Entidades.Carrito import Carrito
+from Entidades.Producto import Producto
 
 router = APIRouter(prefix="/detalles_carrito", tags=["Detalle_carrito"])
 
@@ -21,38 +23,40 @@ def crear_Detalle_carrito(detalle: DetalleCarritoCreate, db: Session = Depends(g
     Modulo para crear un detalle, más tirando a una creacion de un producto
 
     """
-    carrito = (
-        db.query(Entidades.Carrito)
-        .filter(Entidades.Carrito.id_carrito == detalle.id_carrito)
-        .first()
-    )
-    if not carrito:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Carrito no encontrado."
+    try:
+
+        carrito = (
+            db.query(Carrito).filter(Carrito.id_carrito == detalle.id_carrito).first()
         )
-    producto = (
-        db.query(Entidades.Producto)
-        .filter(Entidades.Producto.id_producto == detalle.id_producto)
-        .first()
-    )
-    if not producto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado."
+        if not carrito:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Carrito no encontrado."
+            )
+        producto = (
+            db.query(Producto)
+            .filter(Producto.id_producto == detalle.id_producto)
+            .first()
+        )
+        if not producto:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado."
+            )
+
+        nuevo_detalle = Detalle_carrito(
+            id_carrito=detalle.id_carrito,
+            id_producto=detalle.id_producto,
+            cantidad=detalle.cantidad,
         )
 
-    subtotal = producto.precio * detalle.cantidad
+        db.add(nuevo_detalle)
+        db.commit()
+        db.refresh(nuevo_detalle)
+        return nuevo_detalle
 
-    nuevo_detalle = Entidades.Detalle_carrito(
-        id_carrito=detalle.id_carrito,
-        id_producto=detalle.id_producto,
-        cantidad=detalle.cantidad,
-        subtotal=subtotal,
-    )
-
-    db.add(nuevo_detalle)
-    db.commit()
-    db.refresh(nuevo_detalle)
-    return nuevo_detalle
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al crear carrito: {str(e)}")
 
 
 @router.get("/{id_carrito}", response_model=List[DetalleCarritoResponse])
@@ -62,9 +66,7 @@ def buscar_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
 
     """
     detalles = (
-        db.query(Entidades.Detalle_carrito)
-        .filter(Entidades.Detalle_carrito.id_carrito == id_carrito)
-        .all()
+        db.query(Detalle_carrito).filter(Detalle_carrito.id_carrito == id_carrito).all()
     )
     if not detalles:
         raise HTTPException(
@@ -83,8 +85,8 @@ def actualizar_detalle(
 
     """
     db_detalle = (
-        db.query(Entidades.Detalle_carrito)
-        .filter(Entidades.Detalle_carrito.id_detalle == id_detalle)
+        db.query(Detalle_carrito)
+        .filter(Detalle_carrito.id_detalle == id_detalle)
         .first()
     )
     if not db_detalle:
@@ -94,7 +96,7 @@ def actualizar_detalle(
         )
 
     db_detalle.cantidad = detalle.cantidad
-    db_detalle.subtotal = db_detalle.producto.precio * detalle.cantidad
+    db_detalle.subtotal = db_detalle.producto.precio_producto * detalle.cantidad
     db.commit()
     db.refresh(db_detalle)
     return db_detalle
@@ -105,8 +107,8 @@ def eliminar_producto_detalle(
     id_detalle: UUID, id_producto: UUID, db: Session = Depends(get_db)
 ):
     detalle = (
-        db.query(Entidades.Detalle_carrito)
-        .filter(Entidades.Detalle_carrito.id_detalle == id_detalle)
+        db.query(Detalle_carrito)
+        .filter(Detalle_carrito.id_detalle == id_detalle)
         .first()
     )
     if not detalle:
@@ -116,10 +118,10 @@ def eliminar_producto_detalle(
         )
 
     producto_en_detalle = (
-        db.query(Entidades.Producto)
-        .join(Entidades.Detalle_carrito.productos)
-        .filter(Entidades.Producto.id_producto == id_producto)
-        .filter(Entidades.Detalle_carrito.id_detalle == id_detalle)
+        db.query(Producto)
+        .join(Detalle_carrito.productos)
+        .filter(Producto.id_producto == id_producto)
+        .filter(Detalle_carrito.id_detalle == id_detalle)
         .first()
     )
 

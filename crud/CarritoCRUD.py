@@ -4,6 +4,7 @@ from typing import Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
 from Entidades.Carrito import Carrito
+from Entidades.Usuario import Usuario
 from Entidades.Detalle_carrito import Detalle_carrito
 from Entidades.Producto import Producto
 
@@ -13,7 +14,7 @@ class CarritoCRUD:
     def __init__(self, db: Session):
         self.db = db
 
-    def crear_carrito(self, id_usuario: UUID) -> Carrito:
+    def crear_carrito(self, id_usuario: UUID, activo: bool = True) -> Carrito:
         """Módulo para crear un carrito vacío de compras.
 
         Args: id_usuario para saber a que usuario pertence ese carrito.
@@ -21,8 +22,13 @@ class CarritoCRUD:
         Return: Devolvera un carrito vacio, listo para agregarle productos.
 
         """
+        usuario = (
+            self.db.query(Usuario).filter(Usuario.id_usuario == id_usuario).first()
+        )
+        if not usuario:
+            raise ValueError("El usuario especificado no existe.")
 
-        carrito = Carrito(id_usuario=id_usuario, activo=True)
+        carrito = Carrito(id_usuario=id_usuario, activo=activo)
         self.db.add(carrito)
         self.db.commit()
         self.db.refresh(carrito)

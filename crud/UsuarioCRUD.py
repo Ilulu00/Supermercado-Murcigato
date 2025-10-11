@@ -144,7 +144,7 @@ class UsuarioCRUD:
                 raise ValueError("Correo inválido.")
             if (
                 self.obtener_usuario_por_correo(correo)
-                and self.obtener_usuario_por_correo(correo).id != id_usuario
+                and self.obtener_usuario_por_correo(correo).id_usuario != id_usuario
             ):
                 raise ValueError("El correo ya está registrado.")
             kwargs["correo"] = correo.lower().strip()

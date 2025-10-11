@@ -49,19 +49,23 @@ class CarritoBase(BaseModel):
     id_usuario: UUID
     fecha_crea: datetime
     fecha_actual: Optional[datetime] = None
+    activo: bool
+
+
+class CrearCarrito(BaseModel):
+    id_usuario: UUID
+    activo: bool
 
 
 class RespuestaCarrito(CarritoBase):
     id_carrito: UUID
+    id_usuario: UUID
     fecha_crea: datetime
     fecha_actual: Optional[datetime] = None
+    activo: bool
 
     class Config:
         from_attributes = True
-
-
-class CrearCarrito(CarritoBase):
-    pass
 
 
 class DetalleCarritoBase(BaseModel):
@@ -71,11 +75,12 @@ class DetalleCarritoBase(BaseModel):
 
 
 class DetalleCarritoCreate(DetalleCarritoBase):
-    pass
+    id_detalle: UUID
 
 
 class DetalleCarritoResponse(DetalleCarritoBase):
-    subtotal: int
+    id_detalle: UUID
+    subtotal: float
 
     class Config:
         from_attributes = True
@@ -163,10 +168,11 @@ class ProveedorBase(BaseModel):
     segundo_apellido: Optional[str] = None
     telefono: Optional[str] = None
     correo: str
+    fecha_creacion: datetime
 
 
 class ProveedorCreate(ProveedorBase):
-    fecha_creacion: datetime
+    pass
 
 
 class ProveedorUpdate(BaseModel):
@@ -174,8 +180,8 @@ class ProveedorUpdate(BaseModel):
     segundo_nombre: Optional[str] = None
     primer_apellido: Optional[str] = None
     segundo_apellido: Optional[str] = None
-    correo: Optional[EmailStr] = None
     telefono: Optional[str] = None
+    correo: Optional[EmailStr] = None
 
 
 class ProveedorResponse(ProveedorBase):
