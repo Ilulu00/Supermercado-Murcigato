@@ -123,7 +123,7 @@ class CategoriaCRUD:
                 and self.obtener_categoria_por_nombre(nombre).id != id_categoria
             ):
                 raise ValueError("Ya existe una categoría con ese nombre.")
-            kwargs["nombre"] = nombre.strip()
+            kwargs["nombre_categoria"] = nombre.strip()
 
         if "descripcion" in kwargs and kwargs["descripcion"]:
             kwargs["descripcion"] = kwargs["descripcion"].strip()
