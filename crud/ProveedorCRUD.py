@@ -70,15 +70,17 @@ class ProveedorCRUD:
 
         if telefono and not self.validar_telefono(telefono):
             raise ValueError("Formato de teléfono inválido")
+        
+        fecha_creacion = datetime.now()
 
         proveedor = Proveedor(
             primer_nombre=primer_nombre.lower().strip(),
             segundo_nombre=segundo_nombre.strip() if segundo_nombre else None,
             primer_apellido=primer_apellido.strip(),
             segundo_apellido=segundo_apellido.strip() if segundo_apellido else None,
-            correo=correo.lower().strip(),
             telefono=telefono.strip() if telefono else None,
-            fecha_creacion=datetime.now(),
+            correo=correo.lower().strip(),
+            fecha_creacion=fecha_creacion,
         )
         self.db.add(proveedor)
         self.db.commit()

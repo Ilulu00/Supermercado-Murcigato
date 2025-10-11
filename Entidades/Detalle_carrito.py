@@ -60,22 +60,15 @@ class Detalle_carrito(Base):
 
     def to_dict(self):
         return {
+            "ID detalle": str(self.id_detalle),
             "ID carrito": str(self.id_carrito),
-            "Cliente": {
-                "ID cliente": str(self.carritoUsuario.id_usuario),
-                "Nombre Completo": f"{self.carritoUsuario.primer_nombre} {self.carritoUsuario.segundo_nombre or ''} "
-                f"{self.carritoUsuario.primer_apellido} {self.carritoUsuario.segundo_apellido or ''}",
+            "Producto": {
+                "ID": str(self.producto.id_producto),
+                "Nombre": self.producto.nombre_producto,
+                "Precio unitario": self.producto.precio_producto,
             },
-            "Productos": [
-                {
-                    "ID producto": str(p.id_producto),
-                    "Nombre": p.nombre_producto,
-                    "Precio": p.precio_producto,
-                }
-                for p in self.carritoProducto
-            ],
-            "Precio total": self.Precio_total,
-        }
-
+            "Cantidad": self.cantidad,
+            "Subtotal": self.subtotal,
+    }
 
 from Entidades.Producto import Producto

@@ -98,16 +98,16 @@ async def crear_usuario(usuario_data: UsuarioCreate, db: Session = Depends(get_d
         )
 
 
-@router.put("/{usuario_id}", response_model=UsuarioResponse)
+@router.put("/{id_usuario}", response_model=UsuarioResponse)
 async def actualizar_usuario(
-    usuario_id: UUID, usuario_data: UsuarioUpdate, db: Session = Depends(get_db)
+    id_usuario: UUID, usuario_data: UsuarioUpdate, db: Session = Depends(get_db)
 ):
     """Actualizar un usuario existente."""
     try:
         usuario_crud = UsuarioCRUD(db)
 
         """ Verificar que el usuario existe """
-        usuario_existente = usuario_crud.obtener_usuario(usuario_id)
+        usuario_existente = usuario_crud.obtener_usuario(id_usuario)
         if not usuario_existente:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
@@ -122,7 +122,7 @@ async def actualizar_usuario(
             return usuario_existente
 
         usuario_actualizado = usuario_crud.actualizar_usuario(
-            usuario_id, **campos_actualizacion
+            id_usuario, **campos_actualizacion
         )
         return usuario_actualizado
     except HTTPException:
