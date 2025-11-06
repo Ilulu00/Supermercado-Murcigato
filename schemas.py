@@ -220,6 +220,9 @@ class CarritoConFactura(RespuestaCarrito):
 class CarritoConDetalles(RespuestaCarrito):
     detalles: List[DetalleCarritoResponse] = []
 
+    class Config:
+        from_attributes = True
+
 
 class RespuestaAPI(BaseModel):
     mensaje: str
