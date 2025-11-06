@@ -42,10 +42,16 @@ def listar_carritos(db: Session = Depends(get_db)):
     """
     carritos = (
         db.query(Entidades.Carrito)
-        .options(joinedload(Entidades.Carrito.detalles))
+        .options(
+            joinedload(Entidades.Carrito.detalles).joinedload(
+                Entidades.Detalle_carrito.producto
+            )
+        )
         .all()
     )
     if not carritos:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No se encontraron carritos.")
-    
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND, detail="No se encontraron carritos."
+        )
+
     return carritos

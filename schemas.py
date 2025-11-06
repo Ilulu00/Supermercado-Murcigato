@@ -80,6 +80,7 @@ class DetalleCarritoCreate(DetalleCarritoBase):
 
 class DetalleCarritoResponse(DetalleCarritoBase):
     id_detalle: UUID
+    precio_producto: float
     subtotal: float
 
     class Config:
