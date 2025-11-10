@@ -10,7 +10,8 @@ from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas import CrearCarrito, RespuestaCarrito, CarritoConDetalles
 from sqlalchemy.orm import Session, joinedload
-import Entidades
+from Entidades.Carrito import Carrito
+from Entidades.Detalle_carrito import Detalle_carrito
 
 router = APIRouter(prefix="/carritos", tags=["Carrito"])
 
@@ -35,18 +36,14 @@ def crear_carrito_de_compras(carrito: CrearCarrito, db: Session = Depends(get_db
 
 
 @router.get("/", response_model=List[CarritoConDetalles])
-def listar_carritos(db: Session = Depends(get_db)):
+def listar_carritos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     Módulo para listar todos los carritos que existan
 
     """
     carritos = (
-        db.query(Entidades.Carrito)
-        .options(
-            joinedload(Entidades.Carrito.detalles).joinedload(
-                Entidades.Detalle_carrito.producto
-            )
-        )
+        db.query(Carrito)
+        .options(joinedload(Carrito.detalles).joinedload(Detalle_carrito.producto))
         .all()
     )
     if not carritos:

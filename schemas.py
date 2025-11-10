@@ -91,10 +91,8 @@ class FacturaBase(BaseModel):
     id_usuario: UUID
     id_carrito: UUID
     metodo_pago: str
-    subtotal: Optional[float]
     descuento: Optional[float]
-    total: float
-    fecha_creacion: datetime
+    activo: bool
 
 
 class CrearFactura(FacturaBase):

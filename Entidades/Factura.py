@@ -8,7 +8,7 @@ from typing import List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, DateTime, Float, ForeignKey, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -36,7 +36,7 @@ class Factura(Base):
     metodo_pago = Column(String, nullable=False)
     subtotal = Column(Float, nullable=True)
     total = Column(Float, nullable=True)
-    activo = Column(bool, nullable=False)
+    activo = Column(Boolean, nullable=False)
     descuento = Column(Float, nullable=True)
     id_carrito = Column(
         UUID(as_uuid=True), ForeignKey("Carrito.id_carrito"), nullable=False
@@ -72,7 +72,7 @@ class Factura(Base):
                 f"{self.usuarioF.primer_apellido} {self.usuarioF.segundo_apellido or ''}",
             },
             "Carrito": {
-                "ID Carrito": {self.carritoF.id_carrito},
+                "ID Carrito": str(self.carritoF.id_carrito),
                 "Productos": [
                     {
                         "ID producto": str(dc.producto.id_producto),
