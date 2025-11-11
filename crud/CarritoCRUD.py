@@ -1,15 +1,56 @@
 """Operaciones CRUD de carrito."""
 
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from Entidades.Carrito import Carrito
 from Entidades.Usuario import Usuario
 from Entidades.Detalle_carrito import Detalle_carrito
 from Entidades.Producto import Producto
+from schemas import CarritoOut, DetalleCarritoOut
 
 
 class CarritoCRUD:
+    def listar_carritos(self, skip: int = 0, limit: int = 100) -> List[Carrito]:
+        """_summary_
+
+        Args:
+            skip: seran los numeros de registros a skipear.
+            limit: el numero limite de registris a mostrar.
+
+        Returns:
+            Lista de carritos, y posiblemente tambien los detalles.
+        """
+        carritos = (
+            self.db.query(Carrito)
+            .options(joinedload(Carrito.detalles).joinedload(Detalle_carrito.producto))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+        resultado = []
+        for c in carritos:
+            subtotal_general = sum(d.cantidad * d.precio_producto for d in c.detalles)
+            resultado.append(
+                CarritoOut(
+                    id_carrito=c.id_carrito,
+                    id_usuario=c.id_usuario,
+                    fecha_crea=c.fecha_crea,
+                    activo=c.activo,
+                    detalles=[
+                        DetalleCarritoOut(
+                            nombre_producto=d.producto.nombre_producto,
+                            cantidad=d.cantidad,
+                            precio_producto=d.precio_producto,
+                            subtotal=d.cantidad * d.precio_producto,
+                        )
+                        for d in c.detalles
+                    ],
+                    subtotal_general=subtotal_general,
+                )
+            )
+        return resultado
 
     def __init__(self, db: Session):
         self.db = db

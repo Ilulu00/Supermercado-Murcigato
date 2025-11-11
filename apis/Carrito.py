@@ -8,7 +8,7 @@ from uuid import UUID
 from crud.CarritoCRUD import CarritoCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import CrearCarrito, RespuestaCarrito, CarritoConDetalles
+from schemas import CrearCarrito, RespuestaCarrito, CarritoOut
 from sqlalchemy.orm import Session, joinedload
 from Entidades.Carrito import Carrito
 from Entidades.Detalle_carrito import Detalle_carrito
@@ -35,20 +35,20 @@ def crear_carrito_de_compras(carrito: CrearCarrito, db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail=f"Error al crear carrito: {str(e)}")
 
 
-@router.get("/", response_model=List[CarritoConDetalles])
+@router.get("/", response_model=List[CarritoOut])
 def listar_carritos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     Módulo para listar todos los carritos que existan
 
     """
-    carritos = (
-        db.query(Carrito)
-        .options(joinedload(Carrito.detalles).joinedload(Detalle_carrito.producto))
-        .all()
-    )
-    if not carritos:
+    try:
+        carrito_crud = CarritoCRUD(db)
+        carritos = carrito_crud.listar_carritos(skip=skip, limit=limit)
+        return carritos
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
-            status.HTTP_404_NOT_FOUND, detail="No se encontraron carritos."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener los carritos: {str(e)}",
         )
-
-    return carritos

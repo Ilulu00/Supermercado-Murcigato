@@ -87,11 +87,31 @@ class DetalleCarritoResponse(DetalleCarritoBase):
         from_attributes = True
 
 
+class DetalleCarritoOut(BaseModel):
+    nombre_producto: str
+    cantidad: int
+    precio_producto: float
+    subtotal: float
+
+
+class CarritoOut(BaseModel):
+    id_carrito: UUID
+    id_usuario: UUID
+    fecha_crea: datetime
+    activo: bool
+    detalles: List[DetalleCarritoOut]
+    subtotal_general: float
+
+    class Config:
+        from_attributes = True
+
+
 class FacturaBase(BaseModel):
     id_usuario: UUID
     id_carrito: UUID
     metodo_pago: str
     descuento: Optional[float]
+    total: float
     activo: bool
 
 

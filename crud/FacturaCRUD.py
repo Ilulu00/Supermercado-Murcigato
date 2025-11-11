@@ -93,3 +93,16 @@ class FacturaCRUD:
         )
 
         return {"factura": factura, "detalle": detalles}
+
+    def listar_facturas(self, skip: int = 0, limit: int = 100) -> List[Factura]:
+        """
+        Módulo para listar y mostrar todas las facturas que existan.
+
+        Args:
+            skip: el numero de registros que se quiera skipear.
+            limit: limite de registros a mostrar.
+
+        Returns:
+            Lista de facturas.
+        """
+        return self.db.query(Factura).offset(skip).limit(limit).all()

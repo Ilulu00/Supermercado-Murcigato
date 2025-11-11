@@ -12,9 +12,10 @@ from sqlalchemy.orm import Session
 from Entidades.Carrito import Carrito
 from Entidades.Detalle_carrito import Detalle_carrito
 from Entidades.Factura import Factura
+from crud.FacturaCRUD import FacturaCRUD
 
 
-router = APIRouter(prefix="/facturas", tags=["Factura"]) 
+router = APIRouter(prefix="/facturas", tags=["Factura"])
 
 
 @router.post("/", response_model=RespuestaFactura)
@@ -68,14 +69,17 @@ def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[RespuestaFactura])
-def listar_facturas(db: Session = Depends(get_db)):
+def listar_facturas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     Módulo para listar y mostrar todas las facturas que existan
 
     """
-    facturas = db.query(Factura).all()
-    if not facturas:
+    try:
+        factura_crud = FacturaCRUD(db)
+        facturas = factura_crud.listar_facturas(skip=skip, limit=limit)
+        return facturas
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron facturas"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener las facturas: {str(e)}",
         )
-    return facturas
