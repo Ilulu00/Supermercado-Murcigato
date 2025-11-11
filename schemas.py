@@ -8,6 +8,7 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
 
+# Schemas de usuario
 class UsuarioBase(BaseModel):
     primer_nombre: str
     segundo_nombre: Optional[str] = None
@@ -45,6 +46,7 @@ class UsuarioResponse(UsuarioBase):
         from_attributes = True
 
 
+# Schemas de carrito y detalles_carrito
 class CarritoBase(BaseModel):
     id_usuario: UUID
     fecha_crea: datetime
@@ -106,10 +108,12 @@ class CarritoOut(BaseModel):
         from_attributes = True
 
 
+# Schemas de factura
 class FacturaBase(BaseModel):
     id_usuario: UUID
     id_carrito: UUID
     metodo_pago: str
+    subtotal_total: float
     descuento: Optional[float]
     total: float
     activo: bool
@@ -119,15 +123,26 @@ class CrearFactura(FacturaBase):
     pass
 
 
+class DetalleFacturaRespuesta(BaseModel):
+    nombre_producto: str
+    cantidad: int
+    precio_producto: float
+    subtotal: float
+
+    class config:
+        from_attributes = True
+
+
 class RespuestaFactura(FacturaBase):
     id_factura: UUID
-    subtotal: float
-    fecha_actual: Optional[datetime] = None
+    fecha_creacion: datetime
+    detalles: List[DetalleFacturaRespuesta]
 
     class Config:
         from_attributes = True
 
 
+# Schemas de categoria
 class CategoriaBase(BaseModel):
     nombre_categoria: str
     descripcion: Optional[str] = None
@@ -151,6 +166,7 @@ class CategoriaResponse(CategoriaBase):
         from_attributes = True
 
 
+# Schemas de producto
 class ProductoBase(BaseModel):
     nombre_producto: str
     precio_producto: float
@@ -181,6 +197,7 @@ class ProductoResponse(ProductoBase):
         from_attributes = True
 
 
+# Schemas de proveedor
 class ProveedorBase(BaseModel):
     primer_nombre: str
     segundo_nombre: Optional[str] = None
@@ -213,6 +230,7 @@ class ProveedorResponse(ProveedorBase):
         from_attributes = True
 
 
+# Schemas de relaciones
 class ProductoConCategoria(ProductoResponse):
     categoria: CategoriaResponse
 
@@ -244,6 +262,7 @@ class CarritoConDetalles(RespuestaCarrito):
         from_attributes = True
 
 
+# Schemas del API
 class RespuestaAPI(BaseModel):
     mensaje: str
     exito: bool = True

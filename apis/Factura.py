@@ -4,6 +4,7 @@ API de Factura. Endpoints para operaciones en el api.
 """
 
 from typing import List
+from uuid import UUID
 
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -63,6 +64,25 @@ def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
         )
 
 
+@router.get("/ver/{id_factura}", response_model=RespuestaFactura)
+def ver_factura(id_factura: UUID, db: Session = Depends(get_db)):
+    """
+    Módulo API para ver la factura
+
+    """
+    try:
+        factura_crud = FacturaCRUD(db)
+        factura_usuario = factura_crud.ver_factura(id_factura)
+        return factura_usuario
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno del sistema como: {str(e)}",
+        )
+
+
 @router.get("/", response_model=List[RespuestaFactura])
 def listar_facturas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
@@ -77,4 +97,29 @@ def listar_facturas(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al obtener las facturas: {str(e)}",
+        )
+
+
+@router.patch("/desactivar/{id_factura}", response_model=RespuestaFactura)
+def desactivar_factura(id_factura: UUID, db: Session = Depends(get_db)):
+    """
+    Módulo para desactivar una factura.
+
+    """
+    factura_crud = FacturaCRUD(db)
+    try:
+        factura_desactivada = factura_crud.eliminar_factura(id_factura)
+
+        return factura_desactivada
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Error al buscar la factura: {str(e)}",
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error del sistema como: {str(e)}",
         )

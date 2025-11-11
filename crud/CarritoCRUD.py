@@ -7,13 +7,52 @@ from Entidades.Carrito import Carrito
 from Entidades.Usuario import Usuario
 from Entidades.Detalle_carrito import Detalle_carrito
 from Entidades.Producto import Producto
-from schemas import CarritoOut, DetalleCarritoOut
+from schemas import CarritoOut, DetalleCarritoOut, RespuestaCarrito
 
 
 class CarritoCRUD:
-    def listar_carritos(self, skip: int = 0, limit: int = 100) -> List[Carrito]:
-        """_summary_
+    def ver_carrito(self, id_carrito: UUID) -> Optional[CarritoOut]:
+        """
+        Módulo para visualizar el carrito del cliente, con su detalle.
 
+        Args: carrito sirve para mirar si ese carrito existe para poder verlo con todo y detalles, por eso el "detalle".
+
+        Raises: El carro no existe.
+
+        Return: Devuelve y muestra el carrito, con los productos que tenga.
+        """
+        carrito = (
+            self.db.query(Carrito)
+            .options(joinedload(Carrito.detalles).joinedload(Detalle_carrito.producto))
+            .filter(Carrito.id_carrito == id_carrito)
+            .first()
+        )
+        if not carrito:
+            raise ValueError("El carrito no existe. Por ende, no se puede visualizar.")
+
+        for c in carrito:
+            subtotal_general = sum(d.cantidad * d.precio_producto for d in c.detalles)
+
+        detalle_out = [
+            DetalleCarritoOut(
+                nombre_producto=d.producto.nombre_producto,
+                cantidad=d.cantidad,
+                precio_producto=d.precio_producto,
+                subtotal=d.cantidad * d.precio_producto,
+            )
+            for d in carrito.detalles
+        ]
+        return CarritoOut(
+            id_carrito=carrito.id_carrito,
+            id_usuario=carrito.id_usuario,
+            detalles=detalle_out,
+            subtotal_general=subtotal_general,
+            activo=carrito.activo,
+            fecha_crea=carrito.fecha_crea,
+        )
+
+    def listar_carritos(self, skip: int = 0, limit: int = 100) -> List[Carrito]:
+        """Módulo para mostrar todos los carritos
         Args:
             skip: seran los numeros de registros a skipear.
             limit: el numero limite de registris a mostrar.
@@ -81,7 +120,7 @@ class CarritoCRUD:
         """Módulo para agregar un producto al carrito.
 
         Args: carrito sirve para buscar el carrito y asi poder ingresar productos a este.
-              producto sirve para serciorarse si ese producto existe o no.
+            producto sirve para serciorarse si ese producto existe o no.
 
         Raises:
                 Si el carro no existe.
@@ -116,36 +155,6 @@ class CarritoCRUD:
         self.db.commit()
         self.db.refresh(detalle)
         return detalle
-
-    def ver_carrito(self, id_carrito: UUID):
-        """Módulo para visualizar el carrito del cliente, con su detalle.
-
-        Args: carrito sirve para mirar si ese carrito existe para poder verlo con todo y detalles, por eso el "detalle".
-
-        Raises: El carro no existe.
-
-        Return: Devuelve y muestra el carrito, con los productos que tenga.
-        """
-        carrito = (
-            self.db.query(Carrito).filter(Carrito.id_carrito == id_carrito).first()
-        )
-
-        if not carrito:
-            raise ValueError("El carrito no existe. Por ende, no se peude visualizar.")
-
-        detalle = (
-            self.db.query(Detalle_carrito)
-            .filter(Detalle_carrito.id_carrito == id_carrito)
-            .all()
-        )
-
-        total = sum(det.subtotal for det in detalle)
-
-        return {
-            "carrito": carrito,
-            "productos": detalle,
-            "total": total,
-        }
 
     def actualizar_producto(
         self, id_carrito: UUID, id_producto: UUID, cantidad_nueva: int
