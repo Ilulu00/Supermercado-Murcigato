@@ -121,6 +121,7 @@ class CrearFactura(FacturaBase):
 
 class RespuestaFactura(FacturaBase):
     id_factura: UUID
+    subtotal: float
     fecha_actual: Optional[datetime] = None
 
     class Config:

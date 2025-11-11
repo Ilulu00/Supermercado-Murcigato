@@ -30,7 +30,7 @@ class FacturaCRUD:
             id_carrito (UUID): Es el carrito que lleva la relación del cliente y el detalle.
             lista_detalle (Lista): Es el listado de los detalles de los productos.
             metodo_pago (str): El metodo por el cual, el cliente pago.
-            descuento (float): El descuento aplicado, segun las reglas del supermercado.
+            descuento (float): El descuento aplicado, segun las reglas del supermercado, como que si la compra supera los 50000, se aplicara un descuento del 5%.
 
         Returns:
             Factura: Devuelve la factura con todo y detalles.
@@ -48,6 +48,13 @@ class FacturaCRUD:
             raise ValueError("El carrito no existe, o no se encontro.")
 
         subtotal = sum(detalle.subtotal for detalle in lista_detalles)
+
+        descuento = 0.0
+        if subtotal >= 50000.00:
+            descuento = subtotal * 0.05
+        elif subtotal >= 100000.00:
+            descuento = subtotal * 0.1
+
         total = subtotal - descuento
 
         factura = Factura(
@@ -57,8 +64,11 @@ class FacturaCRUD:
             subtotal=subtotal,
             descuento=descuento,
             total=total,
+            activo=True,
             fecha_creacion=datetime.now(),
         )
+        carrito.activo = False
+
         self.db.add(factura)
         self.db.flush()
 

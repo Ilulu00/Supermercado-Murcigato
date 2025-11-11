@@ -29,6 +29,11 @@ def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
         carrito = (
             db.query(Carrito).filter(Carrito.id_carrito == factura.id_carrito).first()
         )
+        if not carrito:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No se encontro el carrito, por ende no se puede realizar la factura.",
+            )
 
         detalles = (
             db.query(Detalle_carrito)
@@ -36,23 +41,13 @@ def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
             .all()
         )
 
-        if not carrito:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No se encontro el carrito, por ende no se puede realizar la factura.",
-            )
-
-        subtotal = sum(d.subtotal for d in detalles)
-        total = subtotal - (factura.descuento or 0)
-
-        nueva_factura = Factura(
+        factura_crud = FacturaCRUD(db)
+        nueva_factura = factura_crud.crear_factura(
             id_usuario=factura.id_usuario,
             id_carrito=factura.id_carrito,
+            lista_detalles=detalles,
             metodo_pago=factura.metodo_pago,
-            subtotal=subtotal,
             descuento=factura.descuento,
-            total=total,
-            activo=factura.activo,
         )
 
         db.add(nueva_factura)
