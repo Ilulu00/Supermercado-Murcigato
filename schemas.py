@@ -112,11 +112,12 @@ class CarritoOut(BaseModel):
 class FacturaBase(BaseModel):
     id_usuario: UUID
     id_carrito: UUID
+    activo: bool
     metodo_pago: str
     subtotal_total: float
     descuento: Optional[float]
     total: float
-    activo: bool
+
 
 
 class CrearFactura(FacturaBase):

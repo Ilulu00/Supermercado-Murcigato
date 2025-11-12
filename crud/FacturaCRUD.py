@@ -83,7 +83,7 @@ class FacturaCRUD:
 
     def ver_factura(self, id_factura: UUID) -> Optional[RespuestaFactura]:
         """Módulo para ver la factura.
- 
+
         Args:
             id_factura (UUID): El UUID de la factura a buscar
 
@@ -160,10 +160,8 @@ class FacturaCRUD:
                     id_factura=f.id_factura,
                     id_usuario=f.id_usuario,
                     metodo_pago=f.metodo_pago,
-                    descuento=f.descuento,
-                    total=f.total,
                     activo=f.activo,
-                    fecha_creacion=f.fecha_creacion,
+                    id_carrito=f.id_carrito,
                     detalles=[
                         DetalleFacturaRespuesta(
                             nombre_producto=d.producto.nombre_producto,
@@ -174,11 +172,14 @@ class FacturaCRUD:
                         for d in f.carritoF.detalles
                     ],
                     subtotal_total=subtotal_total,
+                    descuento=f.descuento,
+                    total=f.total,
+                    fecha_creacion=f.fecha_creacion,
                 )
             )
         return resultado
 
-    def eliminar_factura(self, id_factura: UUID) -> Factura:
+    def eliminar_factura(self, id_factura: UUID) -> RespuestaFactura:
         """
         Módulo para "eliminar" una factura desactivandola.
 
@@ -189,7 +190,14 @@ class FacturaCRUD:
             Factura eliminada.
         """
         factura = (
-            self.db.query(Factura).filter(Factura.id_factura == id_factura).first()
+            self.db.query(Factura)
+            .options(
+                joinedload(Factura.carritoF)
+                .joinedload(Carrito.detalles)
+                .joinedload(Detalle_carrito.producto)
+            )
+            .filter(Factura.id_factura == id_factura)
+            .first()
         )
         if not factura:
             raise ValueError("La factura a buscar y posterior eliminamiento no existe.")
@@ -198,4 +206,27 @@ class FacturaCRUD:
 
         self.db.commit()
         self.db.refresh(factura)
-        return factura
+
+        subtotal_total = sum(
+            d.cantidad * d.precio_producto for d in factura.carritoF.detalles
+        )
+        return RespuestaFactura(
+            id_factura=factura.id_factura,
+            id_usuario=factura.id_usuario,
+            id_carrito=factura.id_carrito,
+            metodo_pago=factura.metodo_pago,
+            subtotal_total=subtotal_total,
+            descuento=factura.descuento,
+            total=factura.total,
+            activo=factura.activo,
+            fecha_creacion=factura.fecha_creacion,
+            detalles=[
+                DetalleFacturaRespuesta(
+                    nombre_producto=d.producto.nombre_producto,
+                    cantidad=d.cantidad,
+                    precio_producto=d.precio_producto,
+                    subtotal=d.cantidad * d.precio_producto,
+                )
+                for d in factura.carritoF.detalles
+            ],
+        )

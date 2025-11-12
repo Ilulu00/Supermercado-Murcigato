@@ -100,22 +100,23 @@ def listar_facturas(skip: int = 0, limit: int = 100, db: Session = Depends(get_d
         )
 
 
+#
 @router.patch("/desactivar/{id_factura}", response_model=RespuestaFactura)
 def desactivar_factura(id_factura: UUID, db: Session = Depends(get_db)):
     """
     Módulo para desactivar una factura.
 
     """
-    factura_crud = FacturaCRUD(db)
     try:
-        factura_desactivada = factura_crud.eliminar_factura(id_factura)
+        factura_crud = FacturaCRUD(db)
+        factura = factura_crud.eliminar_factura(id_factura)
 
-        return factura_desactivada
+        return factura
 
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Error al buscar la factura: {str(e)}",
+            detail=f"Error al buscar la factura, no se encontro. Error: {str(e)}",
         )
 
     except Exception as e:

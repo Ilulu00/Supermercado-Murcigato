@@ -30,9 +30,6 @@ class CarritoCRUD:
         if not carrito:
             raise ValueError("El carrito no existe. Por ende, no se puede visualizar.")
 
-        for c in carrito:
-            subtotal_general = sum(d.cantidad * d.precio_producto for d in c.detalles)
-
         detalle_out = [
             DetalleCarritoOut(
                 nombre_producto=d.producto.nombre_producto,
@@ -46,7 +43,9 @@ class CarritoCRUD:
             id_carrito=carrito.id_carrito,
             id_usuario=carrito.id_usuario,
             detalles=detalle_out,
-            subtotal_general=subtotal_general,
+            subtotal_general=sum(
+                d.cantidad * d.precio_producto for d in carrito.detalles
+            ),
             activo=carrito.activo,
             fecha_crea=carrito.fecha_crea,
         )

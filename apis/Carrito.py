@@ -35,6 +35,27 @@ def crear_carrito_de_compras(carrito: CrearCarrito, db: Session = Depends(get_db
         raise HTTPException(status_code=500, detail=f"Error al crear carrito: {str(e)}")
 
 
+@router.get("/{id_carrito}", response_model=CarritoOut)
+def ver_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
+    """
+    Módulo API para ver el carrito
+    """
+    try:
+        carrito_crud = CarritoCRUD(db)
+        carrito_usuario = carrito_crud.ver_carrito(id_carrito)
+        return carrito_usuario
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No se encontro el carrito, error: {str(e)}",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno al buscar el carrito: {str(e)}",
+        )
+
+
 @router.get("/", response_model=List[CarritoOut])
 def listar_carritos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
