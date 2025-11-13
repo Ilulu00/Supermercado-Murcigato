@@ -4,12 +4,16 @@ API de Factura. Endpoints para operaciones en el api.
 """
 
 from typing import List
+from uuid import UUID
 
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas import RespuestaFactura, CrearFactura
 from sqlalchemy.orm import Session
-import Entidades
+from Entidades.Carrito import Carrito
+from Entidades.Detalle_carrito import Detalle_carrito
+from Entidades.Factura import Factura
+from crud.FacturaCRUD import FacturaCRUD
 
 
 router = APIRouter(prefix="/facturas", tags=["Factura"])
@@ -21,51 +25,102 @@ def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
     Módulo api para crear la factura, la cual se creara con datos ya existentes.
 
     """
-    carrito = (
-        db.query(Entidades.Carrito)
-        .filter(Entidades.Carrito.id_carrito == factura.id_carrito)
-        .first()
-    )
+    try:
 
-    detalles = (
-        db.query(Entidades.Detalle_carrito)
-        .filter(Entidades.Detalle_carrito.id_carrito == factura.id_carrito)
-        .all()
-    )
+        carrito = (
+            db.query(Carrito).filter(Carrito.id_carrito == factura.id_carrito).first()
+        )
+        if not carrito:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No se encontro el carrito, por ende no se puede realizar la factura.",
+            )
 
-    if not carrito:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No se encontro el carrito, por ende no se puede realizar la factura.",
+        detalles = (
+            db.query(Detalle_carrito)
+            .filter(Detalle_carrito.id_carrito == factura.id_carrito)
+            .all()
         )
 
-    subtotal = sum(d.subtotal for d in detalles)
-    total = subtotal - (factura.descuento or 0)
+        factura_crud = FacturaCRUD(db)
+        nueva_factura = factura_crud.crear_factura(
+            id_usuario=factura.id_usuario,
+            id_carrito=factura.id_carrito,
+            lista_detalles=detalles,
+            metodo_pago=factura.metodo_pago,
+            descuento=factura.descuento,
+        )
 
-    nueva_factura = Entidades.Factura(
-        id_factura=factura.id_factura,
-        metodo_pago=factura.metodo_pago,
-        subtotal=subtotal,
-        descuento=factura.descuento,
-        id_carrito=factura.id_carrito,
-        total=total,
-    )
+        db.add(nueva_factura)
+        db.commit()
+        db.refresh(nueva_factura)
+        return nueva_factura
 
-    db.add(nueva_factura)
-    db.commit()
-    db.refresh(nueva_factura)
-    return nueva_factura
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error al crear la factura: {str(e)}"
+        )
+
+
+@router.get("/ver/{id_factura}", response_model=RespuestaFactura)
+def ver_factura(id_factura: UUID, db: Session = Depends(get_db)):
+    """
+    Módulo API para ver la factura
+
+    """
+    try:
+        factura_crud = FacturaCRUD(db)
+        factura_usuario = factura_crud.ver_factura(id_factura)
+        return factura_usuario
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno del sistema como: {str(e)}",
+        )
 
 
 @router.get("/", response_model=List[RespuestaFactura])
-def listar_facturas(db: Session = Depends(get_db)):
+def listar_facturas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """
     Módulo para listar y mostrar todas las facturas que existan
 
     """
-    facturas = db.query(Entidades.Factura).all()
-    if not facturas:
+    try:
+        factura_crud = FacturaCRUD(db)
+        facturas = factura_crud.listar_facturas(skip=skip, limit=limit)
+        return facturas
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron facturas"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener las facturas: {str(e)}",
         )
-    return facturas
+
+
+#
+@router.patch("/desactivar/{id_factura}", response_model=RespuestaFactura)
+def desactivar_factura(id_factura: UUID, db: Session = Depends(get_db)):
+    """
+    Módulo para desactivar una factura.
+
+    """
+    try:
+        factura_crud = FacturaCRUD(db)
+        factura = factura_crud.eliminar_factura(id_factura)
+
+        return factura
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Error al buscar la factura, no se encontro. Error: {str(e)}",
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error del sistema como: {str(e)}",
+        )

@@ -8,6 +8,7 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
 
+# Schemas de usuario
 class UsuarioBase(BaseModel):
     primer_nombre: str
     segundo_nombre: Optional[str] = None
@@ -45,6 +46,7 @@ class UsuarioResponse(UsuarioBase):
         from_attributes = True
 
 
+# Schemas de carrito y detalles_carrito
 class CarritoBase(BaseModel):
     id_usuario: UUID
     fecha_crea: datetime
@@ -80,34 +82,68 @@ class DetalleCarritoCreate(DetalleCarritoBase):
 
 class DetalleCarritoResponse(DetalleCarritoBase):
     id_detalle: UUID
+    precio_producto: float
     subtotal: float
 
     class Config:
         from_attributes = True
 
 
+class DetalleCarritoOut(BaseModel):
+    nombre_producto: str
+    cantidad: int
+    precio_producto: float
+    subtotal: float
+
+
+class CarritoOut(BaseModel):
+    id_carrito: UUID
+    id_usuario: UUID
+    fecha_crea: datetime
+    activo: bool
+    detalles: List[DetalleCarritoOut]
+    subtotal_general: float
+
+    class Config:
+        from_attributes = True
+
+
+# Schemas de factura
 class FacturaBase(BaseModel):
     id_usuario: UUID
     id_carrito: UUID
+    activo: bool
     metodo_pago: str
-    subtotal: Optional[float]
+    subtotal_total: float
     descuento: Optional[float]
     total: float
-    fecha_creacion: datetime
+
 
 
 class CrearFactura(FacturaBase):
     pass
 
 
+class DetalleFacturaRespuesta(BaseModel):
+    nombre_producto: str
+    cantidad: int
+    precio_producto: float
+    subtotal: float
+
+    class config:
+        from_attributes = True
+
+
 class RespuestaFactura(FacturaBase):
     id_factura: UUID
-    fecha_actual: Optional[datetime] = None
+    fecha_creacion: datetime
+    detalles: List[DetalleFacturaRespuesta]
 
     class Config:
         from_attributes = True
 
 
+# Schemas de categoria
 class CategoriaBase(BaseModel):
     nombre_categoria: str
     descripcion: Optional[str] = None
@@ -131,6 +167,7 @@ class CategoriaResponse(CategoriaBase):
         from_attributes = True
 
 
+# Schemas de producto
 class ProductoBase(BaseModel):
     nombre_producto: str
     precio_producto: float
@@ -161,6 +198,7 @@ class ProductoResponse(ProductoBase):
         from_attributes = True
 
 
+# Schemas de proveedor
 class ProveedorBase(BaseModel):
     primer_nombre: str
     segundo_nombre: Optional[str] = None
@@ -193,6 +231,7 @@ class ProveedorResponse(ProveedorBase):
         from_attributes = True
 
 
+# Schemas de relaciones
 class ProductoConCategoria(ProductoResponse):
     categoria: CategoriaResponse
 
@@ -220,7 +259,11 @@ class CarritoConFactura(RespuestaCarrito):
 class CarritoConDetalles(RespuestaCarrito):
     detalles: List[DetalleCarritoResponse] = []
 
+    class Config:
+        from_attributes = True
 
+
+# Schemas del API
 class RespuestaAPI(BaseModel):
     mensaje: str
     exito: bool = True

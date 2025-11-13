@@ -2,8 +2,9 @@
 
 from typing import Optional, List
 from uuid import UUID
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from Entidades.Factura import Factura
+from schemas import DetalleFacturaRespuesta, RespuestaFactura
 from Entidades.Detalle_carrito import Detalle_carrito
 from Entidades.Usuario import Usuario
 from Entidades.Carrito import Carrito
@@ -30,7 +31,7 @@ class FacturaCRUD:
             id_carrito (UUID): Es el carrito que lleva la relación del cliente y el detalle.
             lista_detalle (Lista): Es el listado de los detalles de los productos.
             metodo_pago (str): El metodo por el cual, el cliente pago.
-            descuento (float): El descuento aplicado, segun las reglas del supermercado.
+            descuento (float): El descuento aplicado, segun las reglas del supermercado, como que si la compra supera los 50000, se aplicara un descuento del 5%.
 
         Returns:
             Factura: Devuelve la factura con todo y detalles.
@@ -48,6 +49,13 @@ class FacturaCRUD:
             raise ValueError("El carrito no existe, o no se encontro.")
 
         subtotal = sum(detalle.subtotal for detalle in lista_detalles)
+
+        descuento = 0.0
+        if subtotal >= 50000.00:
+            descuento = subtotal * 0.05
+        elif subtotal >= 100000.00:
+            descuento = subtotal * 0.1
+
         total = subtotal - descuento
 
         factura = Factura(
@@ -57,8 +65,11 @@ class FacturaCRUD:
             subtotal=subtotal,
             descuento=descuento,
             total=total,
+            activo=True,
             fecha_creacion=datetime.now(),
         )
+        carrito.activo = False
+
         self.db.add(factura)
         self.db.flush()
 
@@ -70,7 +81,7 @@ class FacturaCRUD:
         self.db.refresh(factura)
         return factura
 
-    def ver_factura(self, id_factura: UUID) -> Optional[Factura]:
+    def ver_factura(self, id_factura: UUID) -> Optional[RespuestaFactura]:
         """Módulo para ver la factura.
 
         Args:
@@ -80,16 +91,142 @@ class FacturaCRUD:
             Optional[Factura]: Devuelve y muestra la factura si se encontro.
         """
         factura = (
-            self.db.query(Factura).filter(Factura.id_factura == id_factura).first()
+            self.db.query(Factura)
+            .options(
+                joinedload(Factura.carritoF)
+                .joinedload(Carrito.detalles)
+                .joinedload(Detalle_carrito.producto)
+            )
+            .filter(Factura.id_factura == id_factura)
+            .first()
+        )
+        if not factura:
+            raise ValueError("No existe la factura.")
+
+        detalle_out = [
+            DetalleFacturaRespuesta(
+                nombre_producto=d.producto.nombre_producto,
+                cantidad=d.cantidad,
+                precio_producto=d.precio_producto,
+                subtotal=d.cantidad * d.precio_producto,
+            )
+            for d in factura.carritoF.detalles
+        ]
+        return RespuestaFactura(
+            id_factura=factura.id_factura,
+            id_usuario=factura.id_usuario,
+            id_carrito=factura.id_carrito,
+            detalles=detalle_out,
+            metodo_pago=factura.metodo_pago,
+            subtotal_total=sum(
+                d.cantidad * d.precio_producto for d in factura.carritoF.detalles
+            ),
+            descuento=factura.descuento,
+            total=factura.total,
+            activo=factura.activo,
+            fecha_creacion=factura.fecha_creacion,
         )
 
-        if not factura:
-            raise ValueError("La factura a buscar no existe.")
+    def listar_facturas(self, skip: int = 0, limit: int = 100) -> List[Factura]:
+        """
+        Módulo para listar y mostrar todas las facturas que existan.
 
-        detalles = (
-            self.db.query(Detalle_carrito)
-            .filter(Detalle_carrito.id_Factura == id_factura)
+        Args:
+            skip: el numero de registros que se quiera skipear.
+            limit: limite de registros a mostrar.
+
+        Returns:
+            Lista de facturas.
+        """
+        facturas = (
+            self.db.query(Factura)
+            .options(
+                joinedload(Factura.carritoF)
+                .joinedload(Carrito.detalles)
+                .joinedload(Detalle_carrito.producto)
+            )
+            .offset(skip)
+            .limit(limit)
             .all()
         )
 
-        return {"factura": factura, "detalle": detalles}
+        resultado = []
+        for f in facturas:
+            subtotal_total = sum(
+                d.cantidad * d.precio_producto for d in f.carritoF.detalles
+            )
+            resultado.append(
+                RespuestaFactura(
+                    id_factura=f.id_factura,
+                    id_usuario=f.id_usuario,
+                    metodo_pago=f.metodo_pago,
+                    activo=f.activo,
+                    id_carrito=f.id_carrito,
+                    detalles=[
+                        DetalleFacturaRespuesta(
+                            nombre_producto=d.producto.nombre_producto,
+                            cantidad=d.cantidad,
+                            precio_producto=d.precio_producto,
+                            subtotal=d.cantidad * d.precio_producto,
+                        )
+                        for d in f.carritoF.detalles
+                    ],
+                    subtotal_total=subtotal_total,
+                    descuento=f.descuento,
+                    total=f.total,
+                    fecha_creacion=f.fecha_creacion,
+                )
+            )
+        return resultado
+
+    def eliminar_factura(self, id_factura: UUID) -> RespuestaFactura:
+        """
+        Módulo para "eliminar" una factura desactivandola.
+
+        Args:
+            id_factura: para saber la factura a eliminar
+
+        Returns:
+            Factura eliminada.
+        """
+        factura = (
+            self.db.query(Factura)
+            .options(
+                joinedload(Factura.carritoF)
+                .joinedload(Carrito.detalles)
+                .joinedload(Detalle_carrito.producto)
+            )
+            .filter(Factura.id_factura == id_factura)
+            .first()
+        )
+        if not factura:
+            raise ValueError("La factura a buscar y posterior eliminamiento no existe.")
+
+        factura.activo = False
+
+        self.db.commit()
+        self.db.refresh(factura)
+
+        subtotal_total = sum(
+            d.cantidad * d.precio_producto for d in factura.carritoF.detalles
+        )
+        return RespuestaFactura(
+            id_factura=factura.id_factura,
+            id_usuario=factura.id_usuario,
+            id_carrito=factura.id_carrito,
+            metodo_pago=factura.metodo_pago,
+            subtotal_total=subtotal_total,
+            descuento=factura.descuento,
+            total=factura.total,
+            activo=factura.activo,
+            fecha_creacion=factura.fecha_creacion,
+            detalles=[
+                DetalleFacturaRespuesta(
+                    nombre_producto=d.producto.nombre_producto,
+                    cantidad=d.cantidad,
+                    precio_producto=d.precio_producto,
+                    subtotal=d.cantidad * d.precio_producto,
+                )
+                for d in factura.carritoF.detalles
+            ],
+        )
