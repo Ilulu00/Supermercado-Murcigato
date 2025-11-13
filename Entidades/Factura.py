@@ -8,7 +8,7 @@ from typing import List, Optional
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, DateTime, Float, ForeignKey, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -20,9 +20,10 @@ class Factura(Base):
     Modelo de las columnas que haran parte de la clase factura, la cual servira como base para crear, y posterior mostrar esta factura.
 
         id_factura: El identificador único de cada factura
-        metodo_pago:
-        subtotal:
-        total:
+        metodo_pago: con que metodo pago el usuario
+        subtotal: el total de los productos sin descuento
+        total: el total de los productos con descuento
+        activo: muestra si la factura ya se cancelo o sigue vigente de pago
         descuento: Si al final se aplico un descuento o no, siguiendo ciertas reglas.
         id_carrito: Para mostrar los productos que se compro.
     """
@@ -35,6 +36,7 @@ class Factura(Base):
     metodo_pago = Column(String, nullable=False)
     subtotal = Column(Float, nullable=True)
     total = Column(Float, nullable=True)
+    activo = Column(Boolean, nullable=False)
     descuento = Column(Float, nullable=True)
     id_carrito = Column(
         UUID(as_uuid=True), ForeignKey("Carrito.id_carrito"), nullable=False
@@ -58,6 +60,7 @@ class Factura(Base):
             f"Subtotal: {self.subtotal}\n"
             f"Total: {self.total}\n"
             f"Descuento aplicado: {self.descuento}"
+            f"Estado: {self.activo}\n"
         )
 
     def to_dict(self):
@@ -69,7 +72,7 @@ class Factura(Base):
                 f"{self.usuarioF.primer_apellido} {self.usuarioF.segundo_apellido or ''}",
             },
             "Carrito": {
-                "ID Carrito": {self.carritoF.id_carrito},
+                "ID Carrito": str(self.carritoF.id_carrito),
                 "Productos": [
                     {
                         "ID producto": str(dc.producto.id_producto),
