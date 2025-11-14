@@ -80,6 +80,9 @@ class ProductoCRUD:
         self.db.refresh(producto)
         return producto
 
+    def contar_productos(self):
+        return self.db.query(Producto).count()
+
     def obtener_producto(self, id_producto: UUID) -> Optional[Producto]:
         """
         Obtener un producto por ID

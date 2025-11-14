@@ -47,6 +47,9 @@ class CategoriaCRUD:
         self.db.refresh(categoria)
         return categoria
 
+    def contar_categorias(self):
+        return self.db.query(Categoria).count()
+
     def obtener_categoria(self, id_categoria: UUID) -> Optional[Categoria]:
         """
         Módulo para buscar y mostrar una categoria por su nombre

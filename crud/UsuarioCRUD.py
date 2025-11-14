@@ -112,6 +112,9 @@ class UsuarioCRUD:
             .first()
         )
 
+    def contar_usuarios(self):
+        return self.db.query(Usuario).count()
+
     def obtener_usuarios(self, skip: int = 0, limit: int = 100) -> List[Usuario]:
         """Modulo para mostrar una lista de usuarios con paginas.
 
