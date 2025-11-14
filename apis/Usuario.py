@@ -8,21 +8,37 @@ from uuid import UUID
 from crud.UsuarioCRUD import UsuarioCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import UsuarioCreate, UsuarioResponse, UsuarioUpdate, RespuestaAPI
+from schemas import UsuarioCreate, UsuarioResponse, UsuarioUpdate, UsuarioListResponse
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
 
-@router.get("/", response_model=List[UsuarioResponse])
+@router.get("/", response_model=UsuarioListResponse)
 async def obtener_usuarios(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+    page: int = 1, size: int = 10, db: Session = Depends(get_db)
 ):
     """Obtener todos los usuarios con paginación."""
     try:
         usuario_crud = UsuarioCRUD(db)
-        usuarios = usuario_crud.obtener_usuarios(skip=skip, limit=limit)
-        return usuarios
+
+        total_items = usuario_crud.contar_usuarios()
+        total_pages = (total_items + size - 1) // size
+
+        if page < 1:
+            page = 1
+
+        skip = (page - 1) * size
+        usuarios = usuario_crud.obtener_usuarios(skip=skip, limit=size)
+
+        usuarios_data = [UsuarioResponse.model_validate(u) for u in usuarios]
+        return UsuarioListResponse(
+            data=usuarios_data,
+            totalPages=total_pages,
+            currentPage=page,
+            totalItems=total_items,
+            size=size,
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

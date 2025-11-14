@@ -8,7 +8,7 @@ from uuid import UUID
 
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import RespuestaFactura, CrearFactura
+from schemas import RespuestaFactura, CrearFactura, FacturaListResponse
 from sqlalchemy.orm import Session
 from Entidades.Carrito import Carrito
 from Entidades.Detalle_carrito import Detalle_carrito
@@ -83,16 +83,32 @@ def ver_factura(id_factura: UUID, db: Session = Depends(get_db)):
         )
 
 
-@router.get("/", response_model=List[RespuestaFactura])
-def listar_facturas(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@router.get("/", response_model=FacturaListResponse)
+def listar_facturas(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
     """
     Módulo para listar y mostrar todas las facturas que existan
 
     """
     try:
         factura_crud = FacturaCRUD(db)
-        facturas = factura_crud.listar_facturas(skip=skip, limit=limit)
-        return facturas
+        
+        total_items = factura_crud.contar_facturas()
+        total_pages = (total_items + size - 1) // size
+        
+        if page < 1:
+            page = 1
+        
+        skip = (page - 1) * size
+        facturas = factura_crud.listar_facturas(skip=skip, limit=size)
+        
+        facturas_data = [RespuestaFactura.model_validate(fa) for fa in facturas]
+        return FacturaListResponse(
+            data=facturas_data,
+            totalPages=total_pages,
+            currentPage=page,
+            totalItems=total_items,
+            size=size,
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
