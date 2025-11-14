@@ -70,7 +70,7 @@ class ProveedorCRUD:
 
         if telefono and not self.validar_telefono(telefono):
             raise ValueError("Formato de teléfono inválido")
-        
+
         fecha_creacion = datetime.now()
 
         proveedor = Proveedor(
@@ -86,6 +86,9 @@ class ProveedorCRUD:
         self.db.commit()
         self.db.refresh(proveedor)
         return proveedor
+
+    def contar_proveedores(self):
+        return self.db.query(Proveedor).count()
 
     def obtener_proveedor(self, id_proveedor: UUID) -> Optional[Proveedor]:
         """Para obtener y/o buscar a un proveedor por el id.

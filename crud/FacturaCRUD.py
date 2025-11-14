@@ -80,6 +80,9 @@ class FacturaCRUD:
         self.db.commit()
         self.db.refresh(factura)
         return factura
+    
+    def contar_facturas(self):
+        return self.db.query(Factura).count()
 
     def ver_factura(self, id_factura: UUID) -> Optional[RespuestaFactura]:
         """Módulo para ver la factura.

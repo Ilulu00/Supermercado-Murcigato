@@ -8,21 +8,37 @@ from uuid import UUID
 from crud.Categoria_productoCRUD import CategoriaCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import CategoriaCreate, CategoriaResponse, CategoriaUpdate
+from schemas import CategoriaCreate, CategoriaResponse, CategoriaUpdate, CategoriaListResponse
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/categorias", tags=["categorias"])
 
 
-@router.get("/", response_model=List[CategoriaResponse])
+@router.get("/", response_model=CategoriaListResponse)
 async def obtener_categorias(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+    page: int = 1, size: int = 10, db: Session = Depends(get_db)
 ):
     """Obtener todas las categorías con paginación."""
     try:
         categoria_crud = CategoriaCRUD(db)
-        categorias = categoria_crud.obtener_categorias(skip=skip, limit=limit)
-        return categorias
+        
+        total_items = categoria_crud.contar_categorias()
+        total_pages = (total_items + size - 1) // size
+        
+        if page < 1:
+            page = 1
+        skip = (page - 1) * size
+        
+        categorias = categoria_crud.obtener_categorias(skip=skip, limit=size)
+        
+        categorias_data = [CategoriaResponse.model_validate(ca) for ca in categorias]
+        return CategoriaListResponse(
+            data=categorias_data,
+            totalPages=total_pages,
+            currentPage=page,
+            totalItems=total_items,
+            size=size,
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

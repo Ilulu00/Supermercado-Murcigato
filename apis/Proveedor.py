@@ -8,22 +8,38 @@ from uuid import UUID
 from crud.ProveedorCRUD import ProveedorCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import ProveedorCreate, ProveedorResponse, ProveedorUpdate
+from schemas import ProveedorCreate, ProveedorResponse, ProveedorUpdate, ProveedorListResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 
 router = APIRouter(prefix="/proveedor", tags=["proveedor"])
 
 
-@router.get("/", response_model=List[ProveedorResponse])
+@router.get("/", response_model=ProveedorListResponse)
 async def obtener_proveedores(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+    page: int = 1, size: int = 10, db: Session = Depends(get_db)
 ):
     """Obtener todos los proveedores con paginación."""
     try:
         proveedor_crud = ProveedorCRUD(db)
-        proveedor = proveedor_crud.obtener_proveedores(skip=skip, limit=limit)
-        return proveedor
+        
+        total_items = proveedor_crud.contar_proveedores()
+        total_pages = (total_items + size - 1) // size
+        
+        if page < 1:
+            page = 1
+        
+        skip = (page - 1) * size
+        proveedores = proveedor_crud.obtener_proveedores(skip=skip, limit=size)
+        
+        proveedores_data= [ProveedorResponse.model_validate(pr) for pr in proveedores]
+        return ProveedorListResponse(
+            data=proveedores_data,
+            totalPages=total_pages,
+            currentPage=page,
+            totalItems=total_items,
+            size=size,
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

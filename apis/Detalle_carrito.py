@@ -8,7 +8,7 @@ from uuid import UUID
 
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import DetalleCarritoCreate, DetalleCarritoResponse
+from schemas import DetalleCarritoCreate, DetalleCarritoResponse, DetalleCarritoUpdate
 from sqlalchemy.orm import Session
 from Entidades.Detalle_carrito import Detalle_carrito
 from Entidades.Carrito import Carrito
@@ -42,10 +42,13 @@ def crear_Detalle_carrito(detalle: DetalleCarritoCreate, db: Session = Depends(g
                 status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado."
             )
 
+        subtotal = producto.precio_producto * detalle.cantidad
+
         nuevo_detalle = Detalle_carrito(
             id_carrito=detalle.id_carrito,
             id_producto=detalle.id_producto,
             cantidad=detalle.cantidad,
+            subtotal=subtotal,
         )
 
         db.add(nuevo_detalle)
@@ -76,19 +79,19 @@ def buscar_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
     return detalles
 
 
-@router.put("/{id_detalle}", response_model=DetalleCarritoResponse)
+@router.put("/{id_detalle}", response_model=DetalleCarritoUpdate)
 def actualizar_detalle(
-    id_detalle: UUID, detalle=DetalleCarritoCreate, db: Session = Depends(get_db)
+    id_detalle: UUID, detalle: DetalleCarritoCreate, db: Session = Depends(get_db)
 ):
     """
     Módulo para actualizar la cantidad de un producto dentro de un detalle
 
     """
     db_detalle = (
-        db.query(Detalle_carrito)
+        db.query(Detalle_carrito) 
         .filter(Detalle_carrito.id_detalle == id_detalle)
         .first()
-    )
+    )     
     if not db_detalle:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -96,16 +99,13 @@ def actualizar_detalle(
         )
 
     db_detalle.cantidad = detalle.cantidad
-    db_detalle.subtotal = db_detalle.producto.precio_producto * detalle.cantidad
     db.commit()
     db.refresh(db_detalle)
     return db_detalle
 
 
 @router.delete("/{id_detalle}")
-def eliminar_producto_detalle(
-    id_detalle: UUID, id_producto: UUID, db: Session = Depends(get_db)
-):
+def eliminar_producto_detalle(id_detalle: UUID, db: Session = Depends(get_db)):
     detalle = (
         db.query(Detalle_carrito)
         .filter(Detalle_carrito.id_detalle == id_detalle)
@@ -117,21 +117,7 @@ def eliminar_producto_detalle(
             detail="El detalle no fue encontrado.",
         )
 
-    producto_en_detalle = (
-        db.query(Producto)
-        .join(Detalle_carrito.productos)
-        .filter(Producto.id_producto == id_producto)
-        .filter(Detalle_carrito.id_detalle == id_detalle)
-        .first()
-    )
-
-    if not producto_en_detalle:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="El producto no se encuentra en este detalle.",
-        )
-
-    db.delete(producto_en_detalle)
+    db.delete(detalle)
     db.commit()
 
     return {"mensaje": "Producto eliminado del detalle correctamente."}

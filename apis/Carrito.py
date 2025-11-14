@@ -8,7 +8,7 @@ from uuid import UUID
 from crud.CarritoCRUD import CarritoCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import CrearCarrito, RespuestaCarrito, CarritoOut
+from schemas import CrearCarrito, RespuestaCarrito, CarritoOut, CarritoListResponse
 from sqlalchemy.orm import Session, joinedload
 from Entidades.Carrito import Carrito
 from Entidades.Detalle_carrito import Detalle_carrito
@@ -43,7 +43,7 @@ def ver_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
     try:
         carrito_crud = CarritoCRUD(db)
         carrito_usuario = carrito_crud.ver_carrito(id_carrito)
-        return carrito_usuario
+        return carrito_usuario 
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -56,16 +56,32 @@ def ver_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
         )
 
 
-@router.get("/", response_model=List[CarritoOut])
-def listar_carritos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+@router.get("/", response_model=CarritoListResponse)
+def listar_carritos(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
     """
     Módulo para listar todos los carritos que existan
 
     """
     try:
         carrito_crud = CarritoCRUD(db)
-        carritos = carrito_crud.listar_carritos(skip=skip, limit=limit)
-        return carritos
+
+        total_items = carrito_crud.contar_carritos()
+        total_pages = (total_items + size - 1) // size
+
+        if page < 1:
+            page = 1
+
+        skip = (page - 1) * size
+        carritos = carrito_crud.listar_carritos(skip=skip, limit=size)
+
+        carritos_data = [CarritoOut.model_validate(cr) for cr in carritos]
+        return CarritoListResponse(
+            data=carritos_data,
+            totalPages=total_pages,
+            currentPage=page,
+            totalItems=total_items,
+            size=size,
+        )
     except HTTPException:
         raise
     except Exception as e:
