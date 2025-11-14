@@ -8,11 +8,7 @@ from uuid import UUID
 from crud.UsuarioCRUD import UsuarioCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import (
-    UsuarioCreate,
-    UsuarioResponse,
-    UsuarioUpdate,
-)
+from schemas import UsuarioCreate, UsuarioResponse, UsuarioUpdate, RespuestaAPI
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
@@ -87,6 +83,7 @@ async def crear_usuario(usuario_data: UsuarioCreate, db: Session = Depends(get_d
             segundo_nombre=usuario_data.segundo_nombre,
             segundo_apellido=usuario_data.segundo_apellido,
             telefono=usuario_data.telefono,
+            es_admin=usuario_data.es_admin,
         )
         return usuario
     except ValueError as e:
@@ -133,4 +130,36 @@ async def actualizar_usuario(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al actualizar usuario: {str(e)}",
+        )
+
+
+@router.get("/admin/lista", response_model=List[UsuarioResponse])
+async def obtener_usuarios_admin(db: Session = Depends(get_db)):
+    """Obtener todos los usuarios administradores."""
+    try:
+        usuario_crud = UsuarioCRUD(db)
+        admins = usuario_crud.obtener_usuarios_admin()
+        return admins
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener administradores: {str(e)}",
+        )
+
+
+@router.get("/{usuario_id}/es-admin", response_model=RespuestaAPI)
+async def verificar_es_admin(usuario_id: UUID, db: Session = Depends(get_db)):
+    """Verificar si un usuario es administrador."""
+    try:
+        usuario_crud = UsuarioCRUD(db)
+        es_admin = usuario_crud.es_admin(usuario_id)
+        return RespuestaAPI(
+            mensaje=f"El usuario {'es' if es_admin else 'no es'} administrador",
+            exito=True,
+            datos={"es_admin": es_admin},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al verificar administrador: {str(e)}",
         )
