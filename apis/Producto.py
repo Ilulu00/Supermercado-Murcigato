@@ -8,21 +8,42 @@ from uuid import UUID
 from crud.ProductoCRUD import ProductoCRUD
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import ProductoCreate, ProductoResponse, ProductoUpdate
+from schemas import (
+    ProductoCreate,
+    ProductoResponse,
+    ProductoUpdate,
+    ProductoListResponse,
+)
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/productos", tags=["productos"])
 
 
-@router.get("/", response_model=List[ProductoResponse])
+@router.get("/", response_model=ProductoListResponse)
 async def obtener_productos(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+    page: int = 1, size: int = 10, db: Session = Depends(get_db)
 ):
     """Obtener todos los productos con paginación."""
     try:
         producto_crud = ProductoCRUD(db)
-        productos = producto_crud.obtener_productos(skip=skip, limit=limit)
-        return productos
+
+        total_items = producto_crud.contar_productos()
+        total_pages = (total_items + size - 1) // size
+
+        if page < 1:
+            page = 1
+
+        skip = (page - 1) * size
+        productos = producto_crud.obtener_productos(skip=skip, limit=size)
+
+        productos_data = [ProductoResponse.model_validate(p) for p in productos]
+        return ProductoListResponse(
+            data=productos_data,
+            totalPages=total_pages,
+            currentPage=page,
+            totalItems=total_items,
+            size=size,
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -108,7 +129,7 @@ async def crear_producto(producto_data: ProductoCreate, db: Session = Depends(ge
             precio_producto=producto_data.precio_producto,
             stock=producto_data.stock,
             id_categoria=producto_data.id_categoria,
-            id_proveedor=producto_data.id_proveedor
+            id_proveedor=producto_data.id_proveedor,
         )
         return producto
     except ValueError as e:

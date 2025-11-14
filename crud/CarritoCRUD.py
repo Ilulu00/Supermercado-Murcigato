@@ -52,6 +52,9 @@ class CarritoCRUD:
             fecha_crea=carrito.fecha_crea,
         )
 
+    def contar_carritos(self):
+        return self.db.query(Carrito).count()
+
     def listar_carritos(self, skip: int = 0, limit: int = 100) -> List[Carrito]:
         """Módulo para mostrar todos los carritos
         Args:
@@ -163,7 +166,7 @@ class CarritoCRUD:
         self, id_detalle: UUID, cantidad_nueva: int
     ) -> Optional[Detalle_carrito]:
         """Módulo para actualizar algun producto que este en el carrito."""
-        
+
         detalle = (
             self.db.query(Detalle_carrito)
             .filter(
@@ -183,9 +186,7 @@ class CarritoCRUD:
         return detalle
 
 
-def eliminar_producto(
-    self, id_detalle: UUID
-) -> Optional[Detalle_carrito]:
+def eliminar_producto(self, id_detalle: UUID) -> Optional[Detalle_carrito]:
     """
     Módulo para eliminar un producto del carrito
 

@@ -46,6 +46,17 @@ class UsuarioResponse(UsuarioBase):
         from_attributes = True
 
 
+class UsuarioListResponse(BaseModel):
+    data: List[UsuarioResponse]
+    totalPages: int
+    currentPage: int
+    totalItems: int
+    size: int
+
+    class Config:
+        from_attributes = True
+
+
 # Schemas de carrito y detalles_carrito
 class CarritoBase(BaseModel):
     id_usuario: UUID
@@ -114,6 +125,17 @@ class CarritoOut(BaseModel):
         from_attributes = True
 
 
+class CarritoListResponse(BaseModel):
+    data: List[CarritoOut]
+    totalPages: int
+    currentPage: int
+    totalItems: int
+    size: int
+
+    class Config:
+        from_attributes = True
+
+
 # Schemas de factura
 class FacturaBase(BaseModel):
     id_usuario: UUID
@@ -148,6 +170,17 @@ class RespuestaFactura(FacturaBase):
         from_attributes = True
 
 
+class FacturaListResponse(BaseModel):
+    data: List[RespuestaFactura]
+    totalPages: int
+    currentPage: int
+    totalItems: int
+    size: int
+
+    class Config:
+        from_attributes = True
+
+
 # Schemas de categoria
 class CategoriaBase(BaseModel):
     nombre_categoria: str
@@ -167,6 +200,17 @@ class CategoriaResponse(CategoriaBase):
     id_categoria: UUID
     fecha_creacion: datetime
     fecha_edicion: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class CategoriaListResponse(BaseModel):
+    data: List[CategoriaResponse]
+    totalPages: int
+    currentPage: int
+    totalItems: int
+    size: int
 
     class Config:
         from_attributes = True
@@ -196,8 +240,18 @@ class ProductoUpdate(BaseModel):
 
 class ProductoResponse(ProductoBase):
     id_producto: UUID
-    fecha_creacion: datetime
     fecha_actualizacion: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ProductoListResponse(BaseModel):
+    data: List[ProductoResponse]
+    totalPages: int
+    currentPage: int
+    totalItems: int
+    size: int
 
     class Config:
         from_attributes = True
@@ -231,6 +285,17 @@ class ProveedorResponse(ProveedorBase):
     id_proveedor: UUID
     fecha_creacion: datetime
     fecha_actualizacion: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ProveedorListResponse(BaseModel):
+    data: List[ProveedorResponse]
+    totalPages: int
+    currentPage: int
+    totalItems: int
+    size: int
 
     class Config:
         from_attributes = True
