@@ -51,10 +51,10 @@ class FacturaCRUD:
         subtotal = sum(detalle.subtotal for detalle in lista_detalles)
 
         descuento = 0.0
-        if subtotal >= 50000.00:
-            descuento = subtotal * 0.05
-        elif subtotal >= 100000.00:
+        if subtotal >= 100000.00:
             descuento = subtotal * 0.1
+        elif subtotal >= 50000.00:
+            descuento = subtotal * 0.05
 
         total = subtotal - descuento
 
