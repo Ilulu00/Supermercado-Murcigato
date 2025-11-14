@@ -80,6 +80,10 @@ class DetalleCarritoCreate(DetalleCarritoBase):
     id_detalle: UUID
 
 
+class DetalleCarritoUpdate(BaseModel):
+    cantidad: int
+
+
 class DetalleCarritoResponse(DetalleCarritoBase):
     id_detalle: UUID
     precio_producto: float
@@ -90,6 +94,8 @@ class DetalleCarritoResponse(DetalleCarritoBase):
 
 
 class DetalleCarritoOut(BaseModel):
+    id_detalle: UUID
+    id_producto: UUID
     nombre_producto: str
     cantidad: int
     precio_producto: float
@@ -117,7 +123,6 @@ class FacturaBase(BaseModel):
     subtotal_total: float
     descuento: Optional[float]
     total: float
-
 
 
 class CrearFactura(FacturaBase):

@@ -19,7 +19,7 @@ class Detalle_carrito(Base):
     """
     Modelo de los detalles de un carro de compras, donde se podran guardar mas de 1 producto.
 
-        id_detalle_carrito: identificador unico.
+        id_detalle: identificador unico.
         id_carrito: Llave foranea que conecta al carrito con los detalles de los productos.
         id_producto: LLave foranea que conecte los productos y sus datos con el Detalle carrito
         cantidad: cuanta cantidad de x producto hay en el carrito.
@@ -38,7 +38,7 @@ class Detalle_carrito(Base):
         UUID(as_uuid=True), ForeignKey("Productos.id_producto"), nullable=False
     )
     cantidad = Column(Integer, nullable=False)
- 
+
     carrito = relationship(
         "Carrito", back_populates="detalles", foreign_keys=[id_carrito]
     )

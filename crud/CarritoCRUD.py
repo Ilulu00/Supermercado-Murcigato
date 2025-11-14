@@ -32,6 +32,8 @@ class CarritoCRUD:
 
         detalle_out = [
             DetalleCarritoOut(
+                id_detalle=d.id_detalle,
+                id_producto=d.id_producto,
                 nombre_producto=d.producto.nombre_producto,
                 cantidad=d.cantidad,
                 precio_producto=d.precio_producto,
@@ -78,6 +80,8 @@ class CarritoCRUD:
                     activo=c.activo,
                     detalles=[
                         DetalleCarritoOut(
+                            id_detalle=d.id_detalle,
+                            id_producto=d.producto.id_producto,
                             nombre_producto=d.producto.nombre_producto,
                             cantidad=d.cantidad,
                             precio_producto=d.precio_producto,
@@ -156,22 +160,14 @@ class CarritoCRUD:
         return detalle
 
     def actualizar_producto(
-        self, id_carrito: UUID, id_producto: UUID, cantidad_nueva: int
+        self, id_detalle: UUID, cantidad_nueva: int
     ) -> Optional[Detalle_carrito]:
         """Módulo para actualizar algun producto que este en el carrito."""
-
-        carrito = (
-            self.db.query(Carrito).filter(Carrito.id_carrito == id_carrito).first()
-        )
-
-        if not carrito:
-            raise ValueError("El carrito no existe. No se pueden actualizar productos.")
-
+        
         detalle = (
             self.db.query(Detalle_carrito)
             .filter(
-                Detalle_carrito.id_carrito == id_carrito,
-                Detalle_carrito.id_producto == id_producto,
+                Detalle_carrito.id_detalle == id_detalle,
             )
             .first()
         )
@@ -188,7 +184,7 @@ class CarritoCRUD:
 
 
 def eliminar_producto(
-    self, id_carrito: UUID, id_producto: UUID
+    self, id_detalle: UUID
 ) -> Optional[Detalle_carrito]:
     """
     Módulo para eliminar un producto del carrito
@@ -203,8 +199,7 @@ def eliminar_producto(
     detalle = (
         self.db.query(Detalle_carrito)
         .filter(
-            Detalle_carrito.id_carrito == id_carrito,
-            Detalle_carrito.id_producto == id_producto,
+            Detalle_carrito.id_detalle == id_detalle,
         )
         .first()
     )
