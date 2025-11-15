@@ -36,9 +36,23 @@ async def obtener_productos(
         skip = (page - 1) * size
         productos = producto_crud.obtener_productos(skip=skip, limit=size)
 
-        productos_data = [ProductoResponse.model_validate(p) for p in productos]
+        productos_respuesta = []
+        for p in productos:
+            prod_dict = ProductoResponse.model_validate(p).model_dump()
+            if p.categoria:
+                prod_dict["categoria"] = {"nombre_categoria": p.categoria.nombre}
+            else:
+                prod_dict["categoria"] = None
+            if p.proveedor:
+                prod_dict["proveedor"] = {
+                    "nombre": f"{p.proveedor.primer_nombre} {p.proveedor.primer_apellido}"
+                }
+            else:
+                prod_dict["proveedor"] = None
+
+            productos_respuesta.append(ProductoResponse(**prod_dict))
         return ProductoListResponse(
-            data=productos_data,
+            data=productos_respuesta,
             totalPages=total_pages,
             currentPage=page,
             totalItems=total_items,

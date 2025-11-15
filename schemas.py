@@ -194,6 +194,7 @@ class CategoriaCreate(CategoriaBase):
 class CategoriaUpdate(BaseModel):
     nombre_categoria: Optional[str] = None
     descripcion: Optional[str] = None
+    fecha_edicion: Optional[datetime] = None
 
 
 class CategoriaResponse(CategoriaBase):
@@ -241,6 +242,7 @@ class ProductoUpdate(BaseModel):
 class ProductoResponse(ProductoBase):
     id_producto: UUID
     fecha_actualizacion: Optional[datetime] = None
+    categoria: Optional[dict] = None
 
     class Config:
         from_attributes = True
