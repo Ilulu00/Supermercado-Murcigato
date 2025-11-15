@@ -14,6 +14,7 @@ from schemas import (
     UsuarioUpdate,
     UsuarioListResponse,
     RespuestaAPI,
+    EstadoUsuario,
 )
 from sqlalchemy.orm import Session
 
@@ -168,7 +169,7 @@ async def obtener_usuarios_admin(db: Session = Depends(get_db)):
         )
 
 
-@router.get("/{usuario_id}/es-admin", response_model=RespuestaAPI)
+@router.get("/{id_usuario}/es-admin", response_model=RespuestaAPI)
 async def verificar_es_admin(usuario_id: UUID, db: Session = Depends(get_db)):
     """Verificar si un usuario es administrador."""
     try:
@@ -183,4 +184,28 @@ async def verificar_es_admin(usuario_id: UUID, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al verificar administrador: {str(e)}",
+        )
+
+
+@router.patch("/{id_usuario}/cambiar-estado", response_model=UsuarioResponse)
+async def desactivar_Activar_usuario(
+    id_usuario: UUID, estado: EstadoUsuario, db: Session = Depends(get_db)
+):
+    """
+    Módulo para poder activar o desactivar al usuario
+    """
+    try:
+        usuario_crud = UsuarioCRUD(db)
+        usuario = usuario_crud.obtener_usuario(id_usuario)
+        if not usuario:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No se encontro al usuario.",
+            )
+        usuario_crud.desactivarYactivar_Usuario(id_usuario, estado.activo)
+        return usuario
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al cambiar el estado del usuario: {str(e)}",
         )

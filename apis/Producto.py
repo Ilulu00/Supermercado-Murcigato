@@ -38,19 +38,32 @@ async def obtener_productos(
 
         productos_respuesta = []
         for p in productos:
-            prod_dict = ProductoResponse.model_validate(p).model_dump()
-            if p.categoria:
-                prod_dict["categoria"] = {"nombre_categoria": p.categoria.nombre}
-            else:
-                prod_dict["categoria"] = None
-            if p.proveedor:
-                prod_dict["proveedor"] = {
-                    "nombre": f"{p.proveedor.primer_nombre} {p.proveedor.primer_apellido}"
-                }
-            else:
-                prod_dict["proveedor"] = None
-
+            prod_dict = {
+                "id_producto": str(p.id_producto),
+                "nombre_producto": p.nombre_producto,
+                "precio_producto": p.precio_producto,
+                "stock": p.stock,
+                "fecha_creacion": p.fecha_creacion.isoformat(),
+                "fecha_actualizacion": (
+                    p.fecha_actualizacion.isoformat() if p.fecha_actualizacion else None
+                ),
+                "id_categoria": str(p.id_categoria),
+                "categoria": (
+                    {"nombre_categoria": p.categoria.nombre_categoria}
+                    if p.categoria
+                    else None
+                ),
+                "id_proveedor": str(p.id_proveedor),
+                "proveedor": (
+                    {
+                        "nombre": f"{p.proveedor.primer_nombre} {p.proveedor.primer_apellido}"
+                    }
+                    if p.proveedor
+                    else None
+                ),
+            }
             productos_respuesta.append(ProductoResponse(**prod_dict))
+
         return ProductoListResponse(
             data=productos_respuesta,
             totalPages=total_pages,
@@ -75,7 +88,33 @@ async def obtener_producto(id_producto: UUID, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado"
             )
-        return producto
+        prod_dict = {
+            "id_producto": str(producto.id_producto),
+            "nombre_producto": producto.nombre_producto,
+            "precio_producto": producto.precio_producto,
+            "stock": producto.stock,
+            "fecha_creacion": producto.fecha_creacion.isoformat(),
+            "fecha_actualizacion": (
+                producto.fecha_actualizacion.isoformat()
+                if producto.fecha_actualizacion
+                else None
+            ),
+            "id_categoria": str(producto.id_categoria),
+            "categoria": (
+                {"nombre_categoria": producto.categoria.nombre_categoria}
+                if producto.categoria
+                else None
+            ),
+            "id_proveedor": str(producto.id_proveedor),
+            "proveedor": (
+                {
+                    "nombre": f"{producto.proveedor.primer_nombre} {producto.proveedor.primer_apellido}"
+                }
+                if producto.proveedor
+                else None
+            ),
+        }
+        return ProductoResponse(**prod_dict)
     except HTTPException:
         raise
     except Exception as e:
@@ -145,7 +184,36 @@ async def crear_producto(producto_data: ProductoCreate, db: Session = Depends(ge
             id_categoria=producto_data.id_categoria,
             id_proveedor=producto_data.id_proveedor,
         )
-        return producto
+
+        prod_dict = {
+            "id_producto": str(producto.id_producto),
+            "nombre_producto": producto.nombre_producto,
+            "precio_producto": producto.precio_producto,
+            "stock": producto.stock,
+            "fecha_creacion": producto.fecha_creacion.isoformat(),
+            "fecha_actualizacion": (
+                producto.fecha_actualizacion.isoformat()
+                if producto.fecha_actualizacion
+                else None
+            ),
+            "id_categoria": str(producto.id_categoria),
+            "categoria": (
+                {"nombre_categoria": producto.categoria.nombre_categoria}
+                if producto.categoria
+                else None
+            ),
+            "id_proveedor": str(producto.id_proveedor),
+            "proveedor": (
+                {
+                    "nombre": f"{producto.proveedor.primer_nombre} {producto.proveedor.primer_apellido}"
+                }
+                if producto.proveedor
+                else None
+            ),
+        }
+
+        return ProductoResponse(**prod_dict)
+
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:

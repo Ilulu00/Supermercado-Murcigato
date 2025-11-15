@@ -81,6 +81,10 @@ class RespuestaCarrito(CarritoBase):
         from_attributes = True
 
 
+class EstadoUsuario(BaseModel):
+    activo: bool
+
+
 class DetalleCarritoBase(BaseModel):
     id_carrito: UUID
     id_producto: UUID
@@ -243,6 +247,7 @@ class ProductoResponse(ProductoBase):
     id_producto: UUID
     fecha_actualizacion: Optional[datetime] = None
     categoria: Optional[dict] = None
+    Proveedor: Optional[dict] = None
 
     class Config:
         from_attributes = True

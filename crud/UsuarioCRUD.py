@@ -170,7 +170,7 @@ class UsuarioCRUD:
         """
         return self.db.query(Usuario).filter(Usuario.es_admin == True).all()
 
-    def es_admin(self, usuario_id: UUID) -> bool:
+    def es_admin(self, id_usuario: UUID) -> bool:
         """
         Verificar si un usuario es administrador
 
@@ -180,7 +180,7 @@ class UsuarioCRUD:
         Returns:
             True si es administrador, False en caso contrario
         """
-        usuario = self.obtener_usuario(usuario_id)
+        usuario = self.obtener_usuario(id_usuario)
         return usuario.es_admin if usuario else False
 
     def obtener_admin_por_defecto(self) -> Optional[Usuario]:
@@ -192,6 +192,21 @@ class UsuarioCRUD:
         """
         return (
             self.db.query(Usuario)
-            .filter(Usuario.email == "admin@system.com", Usuario.es_admin == True)
+            .filter(Usuario.correo == "admin@system.com", Usuario.es_admin == True)
             .first()
         )
+
+    def desactivarYactivar_Usuario(self, id_usuario: UUID, estado: bool):
+        """
+        Módulo para desactivar o activar un usuario
+
+        Returns:
+            Usuario activado o desactivado
+        """
+        usuario = self.obtener_usuario(id_usuario)
+        if not usuario:
+            raise ValueError("No se encontro al usuario.")
+
+        usuario.activo = estado
+        self.db.commit()
+        return usuario
