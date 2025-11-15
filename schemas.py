@@ -18,6 +18,7 @@ class UsuarioBase(BaseModel):
     correo: str
     activo: bool
     fecha_registro: datetime
+    es_admin: bool = False
 
 
 class UsuarioCreate(UsuarioBase):
@@ -32,6 +33,7 @@ class UsuarioUpdate(BaseModel):
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = None
     activo: Optional[bool] = None
+    es_admin: Optional[bool] = None
 
 
 class UsuarioResponse(UsuarioBase):

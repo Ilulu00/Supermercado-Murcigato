@@ -32,6 +32,7 @@ class UsuarioCRUD:
         segundo_nombre: str = None,
         segundo_apellido: str = None,
         telefono: str = None,
+        es_admin: bool = False,
     ) -> Usuario:
         """
         Crear un nuevo usuario con validaciones
@@ -76,6 +77,7 @@ class UsuarioCRUD:
             segundo_apellido=segundo_apellido.strip() if segundo_apellido else None,
             correo=correo.lower().strip(),
             telefono=telefono.strip() if telefono else None,
+            es_admin=es_admin,
         )
 
         self.db.add(usuario)
@@ -158,3 +160,38 @@ class UsuarioCRUD:
         self.db.commit()
         self.db.refresh(usuario)
         return usuario
+
+    def obtener_usuarios_admin(self) -> List[Usuario]:
+        """
+        Obtener todos los usuarios administradores
+
+        Returns:
+            Lista de usuarios administradores
+        """
+        return self.db.query(Usuario).filter(Usuario.es_admin == True).all()
+
+    def es_admin(self, usuario_id: UUID) -> bool:
+        """
+        Verificar si un usuario es administrador
+
+        Args:
+            usuario_id: UUID del usuario
+
+        Returns:
+            True si es administrador, False en caso contrario
+        """
+        usuario = self.obtener_usuario(usuario_id)
+        return usuario.es_admin if usuario else False
+
+    def obtener_admin_por_defecto(self) -> Optional[Usuario]:
+        """
+        Obtener el usuario administrador por defecto
+
+        Returns:
+            Usuario administrador por defecto o None
+        """
+        return (
+            self.db.query(Usuario)
+            .filter(Usuario.email == "admin@system.com", Usuario.es_admin == True)
+            .first()
+        )

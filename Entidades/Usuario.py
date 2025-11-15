@@ -29,6 +29,7 @@ class Usuario(Base):
         activo: para saber como se encuentra el usuario.
         fecha_registro: Fecha y hora de registro.
         fecha_actul: Fecha y hora de última actualización.
+        es_admin: Dice si el usuario tiene rol de administrador
     """
 
     __tablename__ = "Usuarios"
@@ -43,6 +44,7 @@ class Usuario(Base):
     telefono = Column(String(20), nullable=True)
     correo = Column(String(100), nullable=False)
     activo = Column(Boolean, default=True, nullable=False)
+    es_admin = Column(Boolean, default=False)
     fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actual = Column(DateTime, onupdate=datetime.now)
 
@@ -71,6 +73,7 @@ class Usuario(Base):
             "Fecha actualizacion": (
                 self.fecha_actual.isoformat() if self.fecha_actual else None
             ),
+            "es_admin": self.es_admin,
         }
 
 
@@ -95,6 +98,9 @@ class UsuarioBase(BaseModel):
     )
     activo: bool = Field(
         True, description="Señal del usuario, para verificar si esta activo o no"
+    )
+    es_admin: bool = Field(
+        False, description="Indica si el usuario tiene el rol de administrador"
     )
 
     @field_validator("primer_nombre")
@@ -142,6 +148,7 @@ class CrearUsuario(UsuarioBase):
     correo: EmailStr = ...
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)
+    es_admin: bool = Field(False)
 
     @field_validator("primer_nombre")
     def val_primerNombre(cls, v):
@@ -182,6 +189,7 @@ class ActualizarUsuario(UsuarioBase):
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)
+    es_admin: Optional[bool] = Field(False)
 
     @field_validator("primer_nombre")
     def val_primerNombre(cls, v):
