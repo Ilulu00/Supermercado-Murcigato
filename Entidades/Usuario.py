@@ -44,7 +44,7 @@ class Usuario(Base):
     telefono = Column(String(20), nullable=True)
     correo = Column(String(100), nullable=False)
     activo = Column(Boolean, default=True, nullable=False)
-    es_admin = Column(Boolean, default=False)
+    es_admin = Column(Boolean, nullable=False, server_default='False')
     fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actual = Column(DateTime, onupdate=datetime.now)
 
