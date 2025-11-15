@@ -29,7 +29,6 @@ class UsuarioCRUD:
         primer_nombre: str,
         primer_apellido: str,
         correo: str,
-        direccion: str,
         segundo_nombre: str = None,
         segundo_apellido: str = None,
         telefono: str = None,
@@ -70,9 +69,6 @@ class UsuarioCRUD:
         if telefono and not self.validar_telefono(telefono):
             raise ValueError("Formato de teléfono inválido")
 
-        if not direccion:
-            raise ValueError("La direccion es obligatoria")
-
         usuario = Usuario(
             primer_nombre=primer_nombre.lower().strip(),
             segundo_nombre=segundo_nombre.strip() if segundo_nombre else None,
@@ -80,7 +76,6 @@ class UsuarioCRUD:
             segundo_apellido=segundo_apellido.strip() if segundo_apellido else None,
             correo=correo.lower().strip(),
             telefono=telefono.strip() if telefono else None,
-            direccion=direccion,
         )
 
         self.db.add(usuario)

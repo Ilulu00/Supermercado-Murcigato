@@ -95,7 +95,6 @@ async def crear_usuario(usuario_data: UsuarioCreate, db: Session = Depends(get_d
             primer_nombre=usuario_data.primer_nombre,
             primer_apellido=usuario_data.primer_apellido,
             correo=usuario_data.correo,
-            direccion=usuario_data.direccion,
             segundo_nombre=usuario_data.segundo_nombre,
             segundo_apellido=usuario_data.segundo_apellido,
             telefono=usuario_data.telefono,

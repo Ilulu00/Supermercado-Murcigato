@@ -14,10 +14,8 @@ class UsuarioBase(BaseModel):
     segundo_nombre: Optional[str] = None
     primer_apellido: str
     segundo_apellido: Optional[str] = None
-    direccion: str
     telefono: Optional[str] = None
     correo: str
-    telefono: Optional[str] = None
     activo: bool
     fecha_registro: datetime
 
