@@ -24,7 +24,6 @@ class Usuario(Base):
         segundo_nombre: El aegundo nombre del usuario.
         primer_apellido: El primer apellido del usuario.
         segundo_apellido: El segundo apellido del usuario.
-        direccion: El lugar de residencia del usuario.
         telefono: Como contactar al usuario.
         correo: direccion de correo del usuario.
         activo: para saber como se encuentra el usuario.
@@ -42,11 +41,10 @@ class Usuario(Base):
     segundo_nombre = Column(String(50), nullable=True)
     primer_apellido = Column(String(50), nullable=False)
     segundo_apellido = Column(String(50), nullable=True)
-    direccion = Column(String(100), nullable=False)
     telefono = Column(String(20), nullable=True)
     correo = Column(String(100), nullable=False)
     activo = Column(Boolean, default=True, nullable=False)
-    es_admin = Column(Boolean, default=False)
+    es_admin = Column(Boolean, nullable=False, server_default='False')
     fecha_registro = Column(DateTime, default=datetime.now, nullable=False)
     fecha_actual = Column(DateTime, onupdate=datetime.now)
 
@@ -66,7 +64,6 @@ class Usuario(Base):
             "Segundo nombre": self.segundo_nombre,
             "Primer apellido": self.primer_apellido,
             "Segundo apellido": self.segundo_apellido,
-            "Direccion": self.direccion,
             "Correo": self.correo,
             "Telefono": self.telefono,
             "activo": self.activo,
@@ -93,9 +90,6 @@ class UsuarioBase(BaseModel):
     segundo_apellido: Optional[str] = Field(
         None, min_length=3, max_length=15, description="segundo apellido del usuario"
     )
-    direccion: str = Field(
-        ..., min_length=2, max_length=100, description="Lugar de residencia del usuario"
-    )
     correo: EmailStr = Field(
         ..., min_length=5, max_length=150, description="Correo electronico del usuario"
     )
@@ -119,12 +113,6 @@ class UsuarioBase(BaseModel):
     def val_primerapellido(cls, v):
         if not v.strip():
             raise ValueError("Lo siento, el primer apellido no puede estar vacío.")
-        return v.strip().title()
-
-    @field_validator("direccion")
-    def val_direccion(cls, v):
-        if not v.strip():
-            raise ValueError("La direccion no puede quedar vacía.")
         return v.strip().title()
 
     @field_validator("correo")
@@ -157,7 +145,6 @@ class CrearUsuario(UsuarioBase):
     segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
     primer_apellido: str = Field(..., min_length=3, max_length=15)
     segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
-    direccion: str = Field(..., min_length=2, max_length=100)
     correo: EmailStr = ...
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)
@@ -199,7 +186,6 @@ class ActualizarUsuario(UsuarioBase):
     segundo_nombre: Optional[str] = Field(None, min_length=3, max_length=15)
     primer_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
     segundo_apellido: Optional[str] = Field(None, min_length=3, max_length=15)
-    direccion: Optional[str] = Field(None, min_length=2, max_length=100)
     correo: Optional[EmailStr] = None
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = Field(True)

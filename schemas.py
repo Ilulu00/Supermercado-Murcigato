@@ -14,10 +14,8 @@ class UsuarioBase(BaseModel):
     segundo_nombre: Optional[str] = None
     primer_apellido: str
     segundo_apellido: Optional[str] = None
-    direccion: str
     telefono: Optional[str] = None
     correo: str
-    telefono: Optional[str] = None
     activo: bool
     fecha_registro: datetime
     es_admin: bool = False
@@ -81,6 +79,10 @@ class RespuestaCarrito(CarritoBase):
 
     class Config:
         from_attributes = True
+
+
+class EstadoUsuario(BaseModel):
+    activo: bool
 
 
 class DetalleCarritoBase(BaseModel):
@@ -196,6 +198,7 @@ class CategoriaCreate(CategoriaBase):
 class CategoriaUpdate(BaseModel):
     nombre_categoria: Optional[str] = None
     descripcion: Optional[str] = None
+    fecha_edicion: Optional[datetime] = None
 
 
 class CategoriaResponse(CategoriaBase):
@@ -243,6 +246,8 @@ class ProductoUpdate(BaseModel):
 class ProductoResponse(ProductoBase):
     id_producto: UUID
     fecha_actualizacion: Optional[datetime] = None
+    categoria: Optional[dict] = None
+    Proveedor: Optional[dict] = None
 
     class Config:
         from_attributes = True
