@@ -179,9 +179,11 @@ class ProductoCRUD:
             producto.nombre_producto = nombre.strip()
 
         if "precio_producto" in kwargs:
-            precio = kwargs.pop("precio_producto")
-            if precio <= 0:
+            precio_producto = kwargs["precio_producto"]
+            if precio_producto <= 0:
                 raise ValueError("El precio debe ser mayor a 0.")
+            producto.precio_producto = precio_producto
+            kwargs.pop("precio_producto")
 
         if "stock" in kwargs:
             cantidad = kwargs["stock"]
@@ -198,6 +200,19 @@ class ProductoCRUD:
             )
             if not categoria:
                 raise ValueError("La categoría especificada no existe.")
+
+        if "id_proveedor" in kwargs:
+            from Entidades.Proveedor import Proveedor
+
+            proveedor = (
+                self.db.query(Proveedor)
+                .filter(Proveedor.id_proveedor == kwargs["id_proveedor"])
+                .first()
+            )
+            if not proveedor:
+                raise ValueError("El proveedor especificado no existe.")
+            producto.id_proveedor = kwargs["id_proveedor"]
+            kwargs.pop("id_proveedor")
 
         for key, value in kwargs.items():
             if hasattr(producto, key):

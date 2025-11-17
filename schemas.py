@@ -240,6 +240,7 @@ class ProductoUpdate(BaseModel):
     precio_producto: Optional[float] = None
     stock: Optional[int] = None
     id_categoria: Optional[UUID] = None
+    id_proveedor: Optional[UUID] = None
     fecha_actualizacion: Optional[datetime]
 
 
