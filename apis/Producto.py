@@ -231,25 +231,53 @@ async def actualizar_producto(
     try:
         producto_crud = ProductoCRUD(db)
 
-        """ Verificar que el producto existe """
         producto_existente = producto_crud.obtener_producto(id_producto)
         if not producto_existente:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado"
             )
 
-        """ Filtrar campos None para actualización """
         campos_actualizacion = {
             k: v for k, v in producto_data.dict().items() if v is not None
         }
 
         if not campos_actualizacion:
-            return producto_existente
+            producto_actualizado = producto_existente
+        else:
+            producto_actualizado = producto_crud.actualizar_producto(
+                id_producto, **campos_actualizacion
+            )
 
-        producto_actualizado = producto_crud.actualizar_producto(
-            id_producto, **campos_actualizacion
-        )
-        return producto_actualizado
+        prod_dict = {
+            "id_producto": str(producto_actualizado.id_producto),
+            "nombre_producto": producto_actualizado.nombre_producto,
+            "precio_producto": producto_actualizado.precio_producto,
+            "stock": producto_actualizado.stock,
+            "fecha_creacion": producto_actualizado.fecha_creacion.isoformat(),
+            "fecha_actualizacion": (
+                producto_actualizado.fecha_actualizacion.isoformat()
+                if producto_actualizado.fecha_actualizacion
+                else None
+            ),
+            "id_categoria": str(producto_actualizado.id_categoria),
+            "categoria": (
+                {"nombre_categoria": producto_actualizado.categoria.nombre_categoria}
+                if producto_actualizado.categoria
+                else None
+            ),
+            "id_proveedor": str(producto_actualizado.id_proveedor),
+            "proveedor": (
+                {
+                    "nombre": f"{producto_actualizado.proveedor.primer_nombre} "
+                    f"{producto_actualizado.proveedor.primer_apellido}"
+                }
+                if producto_actualizado.proveedor
+                else None
+            ),
+        }
+
+        return ProductoResponse(**prod_dict)
+
     except HTTPException:
         raise
     except ValueError as e:
