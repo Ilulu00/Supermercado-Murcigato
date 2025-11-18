@@ -21,7 +21,7 @@ class Factura(Base):
 
         id_factura: El identificador único de cada factura
         metodo_pago: con que metodo pago el usuario
-        subtotal: el total de los productos sin descuento
+        subtotal_total: el total de los productos sin descuento
         total: el total de los productos con descuento
         activo: muestra si la factura ya se cancelo o sigue vigente de pago
         descuento: Si al final se aplico un descuento o no, siguiendo ciertas reglas.
@@ -34,10 +34,10 @@ class Factura(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid4, nullable=False
     )
     metodo_pago = Column(String, nullable=False)
-    subtotal = Column(Float, nullable=True)
+    subtotal_total = Column(Float, nullable=True)
+    descuento = Column(Float, nullable=True)
     total = Column(Float, nullable=True)
     activo = Column(Boolean, nullable=False)
-    descuento = Column(Float, nullable=True)
     id_carrito = Column(
         UUID(as_uuid=True), ForeignKey("Carrito.id_carrito"), nullable=False
     )
@@ -57,7 +57,7 @@ class Factura(Base):
             f"Cliente: {self.usuarioF.id_usuario}\n"
             f"Carrito: {self.carritoF.id_carrito}\n"
             f"Metodo de pago: {self.metodo_pago}\n"
-            f"Subtotal: {self.subtotal}\n"
+            f"Subtotal: {self.subtotal_total}\n"
             f"Total: {self.total}\n"
             f"Descuento aplicado: {self.descuento}"
             f"Estado: {self.activo}\n"
@@ -82,7 +82,7 @@ class Factura(Base):
                     for dc in self.carritoF.productos
                 ],
                 "Metodo de pago": self.metodo_pago,
-                "Subtotal": self.subtotal,
+                "Subtotal": self.subtotal_total,
                 "Total": self.total,
                 "Descuento": self.descuento,
             },

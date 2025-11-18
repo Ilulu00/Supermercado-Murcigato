@@ -47,6 +47,10 @@ class Detalle_carrito(Base):
     )
 
     @property
+    def nombre_producto(self):
+        return self.producto.nombre_producto
+
+    @property
     def precio_producto(self):
         return self.producto.precio_producto
 

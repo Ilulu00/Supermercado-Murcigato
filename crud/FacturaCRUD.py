@@ -48,28 +48,26 @@ class FacturaCRUD:
         if not carrito:
             raise ValueError("El carrito no existe, o no se encontro.")
 
-        subtotal = sum(detalle.subtotal for detalle in lista_detalles)
+        subtotal_total = sum(detalle.subtotal for detalle in lista_detalles)
 
         descuento = 0.0
-        if subtotal >= 100000.00:
-            descuento = subtotal * 0.1
-        elif subtotal >= 50000.00:
-            descuento = subtotal * 0.05
+        if subtotal_total >= 100000.00:
+            descuento = subtotal_total * 0.1
+        elif subtotal_total >= 50000.00:
+            descuento = subtotal_total * 0.05
 
-        total = subtotal - descuento
+        total = subtotal_total - descuento
 
         factura = Factura(
             id_usuario=id_usuario,
             id_carrito=id_carrito,
             metodo_pago=metodo_pago,
-            subtotal=subtotal,
+            subtotal_total=subtotal_total,
             descuento=descuento,
             total=total,
             activo=True,
             fecha_creacion=datetime.now(),
         )
-        carrito.activo = False
-
         self.db.add(factura)
         self.db.flush()
 
@@ -77,10 +75,11 @@ class FacturaCRUD:
             detalle.id_factura = factura.id_factura
             self.db.add(detalle)
 
+        carrito.activo = False
         self.db.commit()
         self.db.refresh(factura)
         return factura
-    
+
     def contar_facturas(self):
         return self.db.query(Factura).count()
 
