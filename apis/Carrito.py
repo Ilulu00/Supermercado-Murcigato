@@ -43,7 +43,7 @@ def ver_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
     try:
         carrito_crud = CarritoCRUD(db)
         carrito_usuario = carrito_crud.ver_carrito(id_carrito)
-        return carrito_usuario 
+        return carrito_usuario
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -89,3 +89,17 @@ def listar_carritos(page: int = 1, size: int = 10, db: Session = Depends(get_db)
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al obtener los carritos: {str(e)}",
         )
+
+
+@router.post("/{id_carrito}/pagar")
+def pagar_carrito(id_carrito: UUID, db: Session = Depends(get_db)):
+    """
+    Módulo API , para poder pagar el carrito
+    """
+    try:
+        carrito_crud = CarritoCRUD(db)
+
+        carrito = carrito_crud.pagar_carrito(id_carrito)
+        return carrito
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

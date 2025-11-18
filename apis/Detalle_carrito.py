@@ -42,13 +42,10 @@ def crear_Detalle_carrito(detalle: DetalleCarritoCreate, db: Session = Depends(g
                 status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado."
             )
 
-        subtotal = producto.precio_producto * detalle.cantidad
-
         nuevo_detalle = Detalle_carrito(
             id_carrito=detalle.id_carrito,
             id_producto=detalle.id_producto,
             cantidad=detalle.cantidad,
-            subtotal=subtotal,
         )
 
         db.add(nuevo_detalle)
@@ -56,8 +53,6 @@ def crear_Detalle_carrito(detalle: DetalleCarritoCreate, db: Session = Depends(g
         db.refresh(nuevo_detalle)
         return nuevo_detalle
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al crear carrito: {str(e)}")
 
@@ -99,7 +94,6 @@ def actualizar_detalle(
         )
 
     db_detalle.cantidad = detalle.cantidad
-    db_detalle.subtotal = db_detalle.producto.precio_producto * detalle.cantidad
     db.commit()
     db.refresh(db_detalle)
 
@@ -127,3 +121,6 @@ def eliminar_producto_detalle(id_detalle: UUID, db: Session = Depends(get_db)):
     db.commit()
 
     return {"mensaje": "Producto eliminado del detalle correctamente."}
+
+    
+    

@@ -8,7 +8,12 @@ from uuid import UUID
 
 from database.config import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas import RespuestaFactura, CrearFactura, FacturaListResponse
+from schemas import (
+    RespuestaFactura,
+    CrearFactura,
+    FacturaListResponse,
+    DetalleFacturaRespuesta,
+)
 from sqlalchemy.orm import Session
 from Entidades.Carrito import Carrito
 from Entidades.Detalle_carrito import Detalle_carrito
@@ -19,22 +24,18 @@ from crud.FacturaCRUD import FacturaCRUD
 router = APIRouter(prefix="/facturas", tags=["Factura"])
 
 
-@router.post("/", response_model=RespuestaFactura)
+@router.post("/{id_carrito}", response_model=RespuestaFactura)
 def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
-    """
-    Módulo api para crear la factura, la cual se creara con datos ya existentes.
-
-    """
     try:
-
         carrito = (
             db.query(Carrito).filter(Carrito.id_carrito == factura.id_carrito).first()
         )
         if not carrito:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="No se encontro el carrito, por ende no se puede realizar la factura.",
+                detail="No se encontró el carrito.",
             )
+        id_usuario = carrito.id_usuario
 
         detalles = (
             db.query(Detalle_carrito)
@@ -44,18 +45,35 @@ def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
 
         factura_crud = FacturaCRUD(db)
         nueva_factura = factura_crud.crear_factura(
-            id_usuario=factura.id_usuario,
             id_carrito=factura.id_carrito,
+            id_usuario=id_usuario,
             lista_detalles=detalles,
             metodo_pago=factura.metodo_pago,
-            descuento=factura.descuento,
+            descuento=0.0,
         )
 
-        db.add(nueva_factura)
-        db.commit()
-        db.refresh(nueva_factura)
-        return nueva_factura
+        detalles_respuesta: List[DetalleFacturaRespuesta] = [
+            DetalleFacturaRespuesta(
+                nombre_producto=d.producto.nombre_producto,
+                cantidad=d.cantidad,
+                precio_producto=d.producto.precio_producto,
+                subtotal=d.subtotal,
+            )
+            for d in detalles
+        ]
 
+        return RespuestaFactura(
+            id_factura=nueva_factura.id_factura,
+            id_usuario=nueva_factura.id_usuario,
+            id_carrito=nueva_factura.id_carrito,
+            activo=nueva_factura.activo,
+            metodo_pago=nueva_factura.metodo_pago,
+            subtotal_total=nueva_factura.subtotal_total,
+            descuento=nueva_factura.descuento,
+            total=nueva_factura.total,
+            fecha_creacion=nueva_factura.fecha_creacion,
+            detalles=detalles_respuesta,
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -91,16 +109,16 @@ def listar_facturas(page: int = 1, size: int = 10, db: Session = Depends(get_db)
     """
     try:
         factura_crud = FacturaCRUD(db)
-        
+
         total_items = factura_crud.contar_facturas()
         total_pages = (total_items + size - 1) // size
-        
+
         if page < 1:
             page = 1
-        
+
         skip = (page - 1) * size
         facturas = factura_crud.listar_facturas(skip=skip, limit=size)
-        
+
         facturas_data = [RespuestaFactura.model_validate(fa) for fa in facturas]
         return FacturaListResponse(
             data=facturas_data,
