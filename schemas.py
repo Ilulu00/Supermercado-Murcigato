@@ -92,7 +92,7 @@ class DetalleCarritoBase(BaseModel):
 
 
 class DetalleCarritoCreate(DetalleCarritoBase):
-    id_detalle: UUID
+    pass
 
 
 class DetalleCarritoUpdate(BaseModel):
@@ -151,8 +151,8 @@ class FacturaBase(BaseModel):
     total: float
 
 
-class CrearFactura(FacturaBase):
-    pass
+class CrearFactura(BaseModel):
+    metodo_pago: str
 
 
 class DetalleFacturaRespuesta(BaseModel):
