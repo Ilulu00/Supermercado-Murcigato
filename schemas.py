@@ -152,7 +152,6 @@ class FacturaBase(BaseModel):
 
 
 class CrearFactura(BaseModel):
-    id_carrito: UUID
     metodo_pago: str
 
 

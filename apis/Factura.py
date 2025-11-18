@@ -25,11 +25,11 @@ router = APIRouter(prefix="/facturas", tags=["Factura"])
 
 
 @router.post("/{id_carrito}", response_model=RespuestaFactura)
-def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
+def crear_factura(
+    id_carrito: UUID, factura: CrearFactura, db: Session = Depends(get_db)
+):
     try:
-        carrito = (
-            db.query(Carrito).filter(Carrito.id_carrito == factura.id_carrito).first()
-        )
+        carrito = db.query(Carrito).filter(Carrito.id_carrito == id_carrito).first()
         if not carrito:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -39,7 +39,7 @@ def crear_factura(factura: CrearFactura, db: Session = Depends(get_db)):
 
         detalles = (
             db.query(Detalle_carrito)
-            .filter(Detalle_carrito.id_carrito == factura.id_carrito)
+            .filter(Detalle_carrito.id_carrito == id_carrito)
             .all()
         )
 
