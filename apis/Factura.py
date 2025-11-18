@@ -45,7 +45,7 @@ def crear_factura(
 
         factura_crud = FacturaCRUD(db)
         nueva_factura = factura_crud.crear_factura(
-            id_carrito=factura.id_carrito,
+            id_carrito=id_carrito,
             id_usuario=id_usuario,
             lista_detalles=detalles,
             metodo_pago=factura.metodo_pago,
