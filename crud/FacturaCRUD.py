@@ -54,7 +54,7 @@ class FacturaCRUD:
         if subtotal_total >= 100000.00:
             descuento = subtotal_total * 0.1
         elif subtotal_total >= 50000.00:
-            descuento = subtotal_total * 0.05
+            descuento = subtotal_total * 0.05 
 
         total = subtotal_total - descuento
 
