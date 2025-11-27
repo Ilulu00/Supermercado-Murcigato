@@ -267,10 +267,7 @@ async def actualizar_producto(
             ),
             "id_proveedor": str(producto_actualizado.id_proveedor),
             "proveedor": (
-                {
-                    "nombre": f"{producto_actualizado.proveedor.primer_nombre} "
-                    f"{producto_actualizado.proveedor.primer_apellido}"
-                }
+                {"id_proveedor": f"{producto_actualizado.proveedor.primer_nombre} "}
                 if producto_actualizado.proveedor
                 else None
             ),
